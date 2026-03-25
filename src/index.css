@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-100;
+  }
+
+  section {
+    scroll-margin-top: 84px;
+  }
+}
+
+/* Scroll-reactive rotating gradient letters */
+.rotating-wrap {
+  --spin: 0deg;
+}
+
+.rotating-letter {
+  display: inline-block;
+  line-height: 1;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  background-image: conic-gradient(
+    from calc(var(--spin) + (var(--i) * 18deg)),
+    #22c55e,
+    #06b6d4,
+    #a855f7,
+    #f97316,
+    #22c55e
+  );
+}
+
+.rotating-caret {
+  display: inline-block;
+  width: 0.5ch;
+  margin-left: 0.05em;
+  color: rgb(255 255 255 / 0.9);
+  animation: rot-caret-blink 1s steps(2) infinite;
+}
+
+@keyframes rot-caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
