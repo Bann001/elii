@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { label: 'Tech Stack', href: '#tech' },
 ] as const
 
-const ROLE_PHRASES = ['interfaces', 'web apps', 'product experiences'] as const
+const ROLE_PHRASES = ['interfaces', 'web_apps', 'product_experiences'] as const
 const ROLE_MAX_CHARS = Math.max(...ROLE_PHRASES.map((p) => p.length))
 const CONTACT_EMAIL = 'bannsire@gmail.com'
 const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/mkopnqdw'
