@@ -54,29 +54,6 @@ function useScrollSpin(containerRef: RefObject<HTMLElement | null>) {
   }, [containerRef])
 }
 
-function useTypeOnce(text: string, speedMs = 90, startDelayMs = 250) {
-  const [shownCount, setShownCount] = useState(0)
-
-  useEffect(() => {
-    let raf = 0
-    const start = performance.now() + startDelayMs
-    const tick = (now: number) => {
-      const next = Math.floor((now - start) / speedMs)
-      const clamped = Math.max(0, Math.min(text.length, next))
-      setShownCount(clamped)
-
-      if (clamped < text.length) {
-        raf = window.requestAnimationFrame(tick)
-      }
-    }
-
-    raf = window.requestAnimationFrame(tick)
-    return () => window.cancelAnimationFrame(raf)
-  }, [text, speedMs, startDelayMs])
-
-  return shownCount
-}
-
 function useTypeCycle(
   phrases: string[],
   opts: { typeMs: number; deleteMs: number; holdMs: number; loop: boolean },
@@ -140,37 +117,6 @@ function useTypeCycle(
   return { visible, done }
 }
 
-function RotatingTypeWord({
-  text,
-  speedMs,
-  startDelayMs,
-  className,
-  showCaret,
-}: {
-  text: string
-  speedMs?: number
-  startDelayMs?: number
-  className?: string
-  showCaret?: boolean
-}) {
-  const wrapperRef = useRef<HTMLSpanElement | null>(null)
-  useScrollSpin(wrapperRef)
-
-  const shownCount = useTypeOnce(text, speedMs ?? 90, startDelayMs ?? 260)
-  const shown = text.slice(0, shownCount)
-
-  return (
-    <span ref={wrapperRef} className={`rotating-wrap inline-flex items-baseline ${className ?? ''}`}>
-      {shown.split('').map((ch, i) => (
-        <span key={`${ch}-${i}`} className="rotating-letter" style={{ ['--i' as any]: i }}>
-          {ch}
-        </span>
-      ))}
-      {showCaret && shownCount < text.length ? <span className="rotating-caret">|</span> : null}
-    </span>
-  )
-}
-
 function RotatingTypeCycle({
   phrases,
   className,
@@ -224,10 +170,7 @@ function Pill({ children }: { children: ReactNode }) {
 
 function HeaderBrand() {
   const baseUrl = import.meta.env.BASE_URL
-  const logoCandidates = useMemo(
-    () => [`${baseUrl}imgs/logo.svg`, `${baseUrl}imgs/pfp.jpg`],
-    [baseUrl],
-  )
+  const logoCandidates = useMemo(() => [`${baseUrl}imgs/pfp.svg`], [baseUrl])
   const [logoIndex, setLogoIndex] = useState(0)
 
   return (
@@ -235,7 +178,7 @@ function HeaderBrand() {
       {logoIndex < logoCandidates.length ? (
         <img
           src={logoCandidates[logoIndex]}
-          alt="BannDev logo"
+          alt="BannDev profile"
           className="h-8 w-auto"
           onError={() => setLogoIndex((v) => v + 1)}
         />
@@ -247,6 +190,7 @@ function HeaderBrand() {
 
 export default function App() {
   const [activeHref, setActiveHref] = useState('#home')
+  const baseUrl = import.meta.env.BASE_URL
 
   const sectionIds = useMemo(() => NAV_ITEMS.map((n) => n.href.replace('#', '')), [])
 
@@ -315,27 +259,41 @@ export default function App() {
         <section id="home" className="min-h-screen pt-28 pb-14">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-              <div>
+              <div className="order-2 lg:order-1">
+                <div className="relative mx-auto w-fit">
+                  <div className="absolute -inset-6 rounded-[32px] bg-gradient-to-r from-fuchsia-500/35 via-cyan-400/25 to-amber-400/25 blur-2xl" />
+                  <div className="relative rounded-[32px] border border-white/10 bg-transparent p-2">
+                    <img
+                      src={`${baseUrl}imgs/pfp.svg`}
+                      alt="BannDev profile picture"
+                      className="h-64 w-64 sm:h-80 sm:w-80 object-contain bg-transparent rounded-3xl"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="order-1 lg:order-2">
                 <div className="flex flex-wrap gap-3">
                   <Pill>ReactJS + Tailwind</Pill>
                   <Pill>Professional UI</Pill>
                   <Pill>Scroll-reactive animations</Pill>
                 </div>
 
-                <h1 className="mt-6 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.05]">
-                  <span className="text-white/90">I craft</span>{' '}
+                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.05]">
+                  <span className="text-white/90 whitespace-nowrap">I craft</span>
                   <RotatingTypeCycle
                     phrases={ROLE_PHRASES as unknown as string[]}
                     typeMs={65}
                     deleteMs={32}
                     holdMs={700}
                     minChars={ROLE_MAX_CHARS + 1}
-                  />{' '}
-                  <span className="text-white/90">for people.</span>
+                  />
+                  <span className="text-white/90 whitespace-nowrap">for people.</span>
                 </h1>
 
                 <p className="mt-5 text-base sm:text-lg text-white/70 max-w-xl">
-                  
+                  Scroll down and watch the colors rotate inside the letters. This one-page portfolio is built to feel
+                  formal, fast, and unmistakably yours.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -352,46 +310,71 @@ export default function App() {
                     Tech Stack
                   </a>
                 </div>
-
-                <div className="mt-10">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-white/70 text-sm uppercase tracking-widest">Name</span>
-                    <RotatingTypeWord text="BannDev" className="text-3xl sm:text-4xl" />
-                  </div>
-                </div>
               </div>
+            </div>
+          </div>
+        </section>
 
-              <div className="relative">
-                <div className="absolute -inset-2 bg-gradient-to-r from-fuchsia-500/30 via-cyan-400/20 to-amber-400/20 blur-2xl" />
-                <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
-                  <h2 className="text-xl font-semibold text-white">What I do</h2>
-                  <div className="mt-6 grid gap-4">
-                    <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                      <div className="font-semibold text-white/90">Clean, scalable UI</div>
-                      <div className="mt-1 text-sm text-white/70">
-                        Tailwind-first layouts with consistent spacing, typography, and accessibility.
-                      </div>
+        <section id="whatido" className="py-16">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="grid gap-10 lg:grid-cols-2 lg:items-stretch">
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-10">
+                <h2 className="text-3xl font-semibold">What I do</h2>
+                <p className="mt-3 text-white/70 max-w-xl">
+                  I design and build professional front-end experiences with clean structure, modern styling, and
+                  motion that adds clarity.
+                </p>
+
+                <div className="mt-8 grid gap-4">
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
+                    <div className="font-semibold text-white/90">Clean, scalable UI</div>
+                    <div className="mt-1 text-sm text-white/70">
+                      Tailwind-first layouts with consistent spacing, typography, and accessibility.
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                      <div className="font-semibold text-white/90">Motion that means something</div>
-                      <div className="mt-1 text-sm text-white/70">
-                        Scroll-reactive effects that guide attention (not distract from content).
-                      </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
+                    <div className="font-semibold text-white/90">Motion that means something</div>
+                    <div className="mt-1 text-sm text-white/70">
+                      Scroll-reactive effects that guide attention (not distract from content).
                     </div>
-                    <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                      <div className="font-semibold text-white/90">Practical front-end engineering</div>
-                      <div className="mt-1 text-sm text-white/70">
-                        Components, forms, and responsive behavior built for real users.
-                      </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
+                    <div className="font-semibold text-white/90">Practical front-end engineering</div>
+                    <div className="mt-1 text-sm text-white/70">
+                      Components, forms, and responsive behavior built for real users.
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-6 flex flex-wrap gap-2">
                   <span className="text-xs text-white/60">Currently: building</span>
                   <span className="text-xs rounded-full px-3 py-1 border border-white/10 bg-white/5 text-white/80">
                     portfolios, dashboards, landing pages
                   </span>
+                </div>
+              </div>
+
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-10 h-full">
+                <div className="text-sm uppercase tracking-widest text-white/60">Highlights</div>
+                <div className="mt-4 grid gap-4">
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
+                    <div className="font-semibold text-white/90">UI polish</div>
+                    <div className="mt-1 text-sm text-white/70">
+                      Consistent spacing, typography, and micro-interactions for a premium feel.
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
+                    <div className="font-semibold text-white/90">Responsive by default</div>
+                    <div className="mt-1 text-sm text-white/70">
+                      Clean layouts that scale from mobile to desktop without breaking.
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
+                    <div className="font-semibold text-white/90">Fast builds</div>
+                    <div className="mt-1 text-sm text-white/70">
+                      Vite + modern tooling for quick iterations and smooth UX.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
