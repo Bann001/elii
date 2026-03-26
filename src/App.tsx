@@ -214,7 +214,11 @@ function Pill({ children }: { children: ReactNode }) {
 }
 
 function HeaderBrand() {
-  const logoCandidates = useMemo(() => ['/imgs/logo.svg', '/imgs/pfp.jpg'], [])
+  const baseUrl = import.meta.env.BASE_URL
+  const logoCandidates = useMemo(
+    () => [`${baseUrl}imgs/logo.svg`, `${baseUrl}imgs/pfp.jpg`],
+    [baseUrl],
+  )
   const [logoIndex, setLogoIndex] = useState(0)
 
   return (
