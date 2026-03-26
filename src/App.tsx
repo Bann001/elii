@@ -325,8 +325,7 @@ export default function App() {
                 </h1>
 
                 <p className="mt-5 text-base sm:text-lg text-white/70 max-w-xl">
-                  Scroll down and watch the colors rotate inside the letters. This one-page portfolio is built to feel
-                  formal, fast, and unmistakably yours.
+                  
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
