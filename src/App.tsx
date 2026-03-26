@@ -291,10 +291,7 @@ export default function App() {
                   <span className="text-white/90 whitespace-nowrap">for people.</span>
                 </h1>
 
-                <p className="mt-5 text-base sm:text-lg text-white/70 max-w-xl">
-                  Scroll down and watch the colors rotate inside the letters. This one-page portfolio is built to feel
-                  formal, fast, and unmistakably yours.
-                </p>
+                <p className="mt-5 text-base sm:text-lg text-white/70 max-w-xl"></p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a
