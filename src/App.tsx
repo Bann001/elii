@@ -9,6 +9,7 @@ const NAV_ITEMS = [
 ] as const
 
 const ROLE_PHRASES = ['interfaces', 'web apps', 'product experiences'] as const
+const ROLE_MAX_CHARS = Math.max(...ROLE_PHRASES.map((p) => p.length))
 const CONTACT_EMAIL = 'hello@example.com'
 const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/mkopnqdw'
 
@@ -177,6 +178,7 @@ function RotatingTypeCycle({
   deleteMs = 35,
   holdMs = 650,
   loop = true,
+  minChars,
 }: {
   phrases: string[]
   className?: string
@@ -184,6 +186,7 @@ function RotatingTypeCycle({
   deleteMs?: number
   holdMs?: number
   loop?: boolean
+  minChars?: number
 }) {
   const wrapperRef = useRef<HTMLSpanElement | null>(null)
   useScrollSpin(wrapperRef)
@@ -196,7 +199,11 @@ function RotatingTypeCycle({
   })
 
   return (
-    <span ref={wrapperRef} className={`rotating-wrap inline-flex items-baseline ${className ?? ''}`}>
+    <span
+      ref={wrapperRef}
+      className={`rotating-wrap inline-flex items-baseline ${className ?? ''}`}
+      style={minChars ? { minWidth: `${minChars}ch` } : undefined}
+    >
       {visible.split('').map((ch, i) => (
         <span key={`${ch}-${i}`} className="rotating-letter" style={{ ['--i' as any]: i }}>
           {ch}
@@ -322,6 +329,7 @@ export default function App() {
                     typeMs={65}
                     deleteMs={32}
                     holdMs={700}
+                    minChars={ROLE_MAX_CHARS + 1}
                   />{' '}
                   <span className="text-white/90">for people.</span>
                 </h1>
