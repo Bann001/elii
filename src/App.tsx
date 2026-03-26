@@ -10,7 +10,7 @@ const NAV_ITEMS = [
 
 const ROLE_PHRASES = ['interfaces', 'web apps', 'product experiences'] as const
 const ROLE_MAX_CHARS = Math.max(...ROLE_PHRASES.map((p) => p.length))
-const CONTACT_EMAIL = 'hello@example.com'
+const CONTACT_EMAIL = 'bannsire@gmail.com'
 const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/mkopnqdw'
 
 function clamp01(n: number) {
@@ -515,25 +515,43 @@ export default function App() {
               </p>
             </div>
 
-            <div className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
               {[
-                'React',
-                'TailwindCSS',
-                'TypeScript',
-                'Vite',
-                'HTML',
-                'CSS',
-                'JavaScript',
-                'Accessibility',
-                'UI Design',
-              ].map((t, idx) => (
-                <span
-                  key={t}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-medium text-white/85 hover:bg-white/10 transition-colors"
-                  style={{ transform: `translateY(${(idx % 3) * 1}px)` }}
+                {
+                  title: 'Programming Languages',
+                  items: ['TypeScript', 'JavaScript', 'HTML', 'CSS3', 'PHP'],
+                },
+                { title: 'Databases', items: ['MySQL', 'PostgreSQL', 'SQLite', 'MongoDB'] },
+                {
+                  title: 'Tools',
+                  items: ['Git', 'Linux', 'Docker', 'Nginx', 'Apache'],
+                },
+                {
+                  title: 'Frameworks',
+                  items: ['React', 'TailwindCSS', 'Vite', 'WordPress', 'Elementor', 'Elementor Pro'],
+                },
+              ].map((group, groupIdx) => (
+                <div
+                  key={group.title}
+                  className="rounded-3xl border border-white/10 bg-white/5 p-6 hover:border-white/25 transition-colors"
                 >
-                  {t}
-                </span>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="text-sm font-semibold text-white/90">{group.title}</div>
+                    <div className="text-xs text-white/50">{group.items.length} items</div>
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {group.items.map((t, idx) => (
+                      <span
+                        key={t}
+                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/85 hover:bg-white/10 transition-colors"
+                        style={{ transform: `translateY(${((idx + groupIdx) % 3) * 1}px)` }}
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -562,7 +580,6 @@ export default function App() {
             </div>
 
             <div className="mt-12 text-xs text-white/50">
-              Replace placeholders (email, project titles) with your real details.
             </div>
           </div>
         </section>
