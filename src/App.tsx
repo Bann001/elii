@@ -9,6 +9,8 @@ const NAV_ITEMS = [
 ] as const
 
 const ROLE_PHRASES = ['interfaces', 'web apps', 'product experiences'] as const
+const CONTACT_EMAIL = 'hello@example.com'
+const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/mkopnqdw'
 
 function clamp01(n: number) {
   return Math.max(0, Math.min(1, n))
@@ -540,10 +542,10 @@ export default function App() {
 
                 <div className="mt-6 flex flex-wrap gap-3">
                   <a
-                    href="mailto:hello@example.com"
+                    href={`mailto:${CONTACT_EMAIL}`}
                     className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 transition-colors"
                   >
-                    Email: hello@example.com
+                    Email: {CONTACT_EMAIL}
                   </a>
                 </div>
               </div>
@@ -571,7 +573,7 @@ function ContactForm() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sent'>('idle')
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'sent' | 'error'>('idle')
 
   const canSubmit = name.trim().length >= 2 && email.includes('@') && message.trim().length >= 10
 
@@ -581,13 +583,45 @@ function ContactForm() {
         onSubmit={(e) => {
           e.preventDefault()
           if (!canSubmit) return
-          setStatus('sent')
+          setStatus('submitting')
+
+          const subject = `Portfolio contact from ${name.trim()}`
+
+          const form = new URLSearchParams()
+          form.set('name', name.trim())
+          form.set('email', email.trim())
+          form.set('message', message.trim())
+          form.set('_subject', subject)
+          // Lets you control the reply-to address in Formspree (if enabled).
+          form.set('_replyto', email.trim())
+
+          fetch(CONTACT_FORM_ENDPOINT, {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: form,
+          })
+            .then(async (res) => {
+              if (!res.ok) throw new Error(`Formspree request failed: ${res.status}`)
+              return res.json().catch(() => null)
+            })
+            .then(() => {
+              setStatus('sent')
+              setName('')
+              setEmail('')
+              setMessage('')
+              window.setTimeout(() => setStatus('idle'), 2500)
+            })
+            .catch(() => setStatus('error'))
         }}
         className="space-y-5"
       >
         <div>
           <label className="text-sm font-semibold text-white/90">Your name</label>
           <input
+            name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm outline-none focus:border-fuchsia-400/50"
@@ -599,6 +633,7 @@ function ContactForm() {
         <div>
           <label className="text-sm font-semibold text-white/90">Email</label>
           <input
+            name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm outline-none focus:border-fuchsia-400/50"
@@ -611,6 +646,7 @@ function ContactForm() {
         <div>
           <label className="text-sm font-semibold text-white/90">Message</label>
           <textarea
+            name="message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             className="mt-2 w-full min-h-[120px] rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm outline-none focus:border-fuchsia-400/50"
@@ -621,10 +657,10 @@ function ContactForm() {
 
         <button
           type="submit"
-          disabled={!canSubmit || status === 'sent'}
+          disabled={!canSubmit || status === 'submitting'}
           className="w-full rounded-xl bg-white text-slate-950 px-4 py-3 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/90 transition-colors"
         >
-          {status === 'sent' ? 'Message queued (demo)' : 'Send message'}
+          {status === 'submitting' ? 'Sending...' : status === 'sent' ? 'Sent!' : status === 'error' ? 'Try again' : 'Send message'}
         </button>
       </form>
     </div>
