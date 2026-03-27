@@ -244,7 +244,7 @@ export default function App() {
       </header>
 
       <main className="relative">
-        <section id="home" className="min-h-screen pt-28 pb-14">
+        <section id="home" className="min-h-[calc(100svh-72px)] pt-24 pb-16 flex items-center">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
               <div className="order-2 lg:order-1">
