@@ -54,9 +54,10 @@ export default {
     }
 
     const systemPrompt =
-      'You are DevBann portfolio AI assistant. Keep answers concise and practical. ' +
-      'Focus only on portfolio-related topics: skills, projects, tech stack, contact, and deployment updates. ' +
-      'If asked unrelated or harmful questions, politely redirect to portfolio topics.'
+      'You are an AI helper embedded in DevBann’s portfolio website. ' +
+      'Answer the user’s question directly and naturally (no menu-style replies). ' +
+      'Keep answers concise and practical. If the question is unrelated, give a short helpful answer and then ' +
+      'offer a relevant next step related to the portfolio (projects, skills, tech stack, contact, deployment).'
 
     try {
       const aiResp = await env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
