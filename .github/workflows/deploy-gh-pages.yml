@@ -25,7 +25,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_CHAT_API_URL: ${{ vars.VITE_CHAT_API_URL }}
+          VITE_CHAT_API_URL: ${{ secrets.VITE_CHAT_API_URL }}
         run: npm run build
 
       - name: Deploy to gh-pages
