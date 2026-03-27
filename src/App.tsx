@@ -169,21 +169,9 @@ function Pill({ children }: { children: ReactNode }) {
 }
 
 function HeaderBrand() {
-  const baseUrl = import.meta.env.BASE_URL
-  const logoCandidates = useMemo(() => [`${baseUrl}imgs/pfp.svg`], [baseUrl])
-  const [logoIndex, setLogoIndex] = useState(0)
-
   return (
-    <a href="#home" className="font-semibold tracking-tight text-white inline-flex items-center gap-3">
-      {logoIndex < logoCandidates.length ? (
-        <img
-          src={logoCandidates[logoIndex]}
-          alt="BannDev profile"
-          className="h-8 w-auto"
-          onError={() => setLogoIndex((v) => v + 1)}
-        />
-      ) : null}
-      {logoIndex >= logoCandidates.length ? <span>BannDev</span> : null}
+    <a href="#home" className="font-semibold tracking-tight text-white inline-flex items-center">
+      DevBann
     </a>
   )
 }
