@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
+import ChatBot from './ChatBot'
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
@@ -558,6 +559,8 @@ export default function App() {
           </div>
         </footer>
       </main>
+
+      <ChatBot />
     </div>
   )
 }
