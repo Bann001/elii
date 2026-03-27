@@ -148,7 +148,7 @@ function RotatingTypeCycle({
     <span
       ref={wrapperRef}
       className={`rotating-wrap inline-flex items-baseline ${className ?? ''}`}
-      style={minChars ? { minWidth: `${minChars}ch` } : undefined}
+      style={minChars ? { minWidth: `min(${minChars}ch, 85vw)` } : undefined}
     >
       {visible.split('').map((ch, i) => (
         <span key={`${ch}-${i}`} className="rotating-letter" style={{ ['--i' as any]: i }}>
@@ -254,7 +254,7 @@ export default function App() {
                     <img
                       src={`${baseUrl}imgs/pfp.svg`}
                       alt="BannDev profile picture"
-                      className="h-64 w-64 sm:h-80 sm:w-80 object-contain bg-transparent rounded-3xl"
+                      className="h-52 w-52 sm:h-64 sm:w-64 lg:h-80 lg:w-80 object-contain bg-transparent rounded-3xl"
                     />
                   </div>
                 </div>
@@ -267,7 +267,7 @@ export default function App() {
                   <Pill>Scroll-reactive animations</Pill>
                 </div>
 
-                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.05]">
+                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-3xl sm:text-4xl lg:text-6xl font-semibold leading-[1.05]">
                   <span className="text-white/90 whitespace-nowrap">I craft</span>
                   <RotatingTypeCycle
                     phrases={ROLE_PHRASES as unknown as string[]}
@@ -279,7 +279,7 @@ export default function App() {
                   <span className="text-white/90 whitespace-nowrap">for people.</span>
                 </h1>
 
-                <p className="mt-5 text-base sm:text-lg text-white/70 max-w-xl"></p>
+                {/* Intentionally no extra hero description on the smallest screens (keeps layout tight). */}
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a
