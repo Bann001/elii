@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
 import ChatBot from './ChatBot'
+import RoadBackground from './RoadBackground'
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
@@ -299,6 +300,8 @@ export default function App() {
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_75%)] opacity-30" />
       </div>
 
+      <RoadBackground />
+
       <header className="fixed left-0 right-0 top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-white/[0.06]">
         <div className="mx-auto max-w-6xl px-4">
           <div className="h-[72px] flex items-center justify-between">
@@ -335,7 +338,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="relative">
+      <main className="relative z-10">
         <section id="home" className="min-h-[calc(100svh-72px)] pt-24 pb-16 flex items-center">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
