@@ -163,15 +163,95 @@ function RotatingTypeCycle({
 
 function Pill({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
+    <span className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-white/75">
       {children}
     </span>
   )
 }
 
+function useReveal() {
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal'))
+    if (!els.length) return
+
+    if (
+      window.matchMedia &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      els.forEach((el) => el.classList.add('is-visible'))
+      return
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      els.forEach((el) => el.classList.add('is-visible'))
+      return
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible')
+            io.unobserve(entry.target)
+          }
+        }
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
+    )
+
+    els.forEach((el) => io.observe(el))
+
+    // Safety net: if anything remains hidden after a few seconds
+    // (e.g. observer never fires), force it visible so content is never lost.
+    const fallback = window.setTimeout(() => {
+      document
+        .querySelectorAll<HTMLElement>('.reveal:not(.is-visible)')
+        .forEach((el) => el.classList.add('is-visible'))
+    }, 3000)
+
+    return () => {
+      io.disconnect()
+      window.clearTimeout(fallback)
+    }
+  }, [])
+}
+
+function SectionHeader({
+  index,
+  eyebrow,
+  title,
+  desc,
+  aside,
+}: {
+  index: string
+  eyebrow: string
+  title: string
+  desc?: string
+  aside?: ReactNode
+}) {
+  return (
+    <div className="flex items-end justify-between gap-6 flex-wrap">
+      <div className="max-w-2xl">
+        <div className="flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-accent">
+          <span className="font-mono text-white/40">{index}</span>
+          <span className="h-px w-8 bg-accent/40" />
+          {eyebrow}
+        </div>
+        <h2 className="mt-4 text-3xl sm:text-4xl font-semibold text-white text-balance">{title}</h2>
+        {desc ? <p className="mt-3 text-white/60 leading-relaxed">{desc}</p> : null}
+      </div>
+      {aside}
+    </div>
+  )
+}
+
 function HeaderBrand() {
   return (
-    <a href="#home" className="font-semibold tracking-tight text-white inline-flex items-center">
+    <a href="#home" className="group inline-flex items-center gap-2 font-display font-semibold tracking-tight text-white">
+      <span className="grid h-8 w-8 place-items-center rounded-lg border border-accent/30 bg-accent/10 text-sm text-accent">
+        B
+      </span>
       DevBann
     </a>
   )
@@ -205,30 +285,35 @@ export default function App() {
     return () => io.disconnect()
   }, [sectionIds])
 
+  useReveal()
+
   return (
     <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(168,85,247,0.22),_transparent_55%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:48px_48px] opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,_rgba(34,211,238,0.14),_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_75%)] opacity-30" />
       </div>
 
-      <header className="fixed left-0 right-0 top-0 z-50 backdrop-blur bg-slate-950/60 border-b border-white/10">
+      <header className="fixed left-0 right-0 top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-white/[0.06]">
         <div className="mx-auto max-w-6xl px-4">
           <div className="h-[72px] flex items-center justify-between">
             <HeaderBrand />
 
-            <nav className="hidden md:flex items-center gap-7 text-sm">
+            <nav className="hidden md:flex items-center gap-1 text-sm">
               {NAV_ITEMS.map((item) => {
                 const isActive = activeHref === item.href
                 return (
                   <a
                     key={item.href}
                     href={item.href}
-                    className={`transition-colors ${
-                      isActive ? 'text-white' : 'text-white/70 hover:text-white'
+                    className={`relative rounded-full px-4 py-2 transition-colors ${
+                      isActive ? 'text-white' : 'text-white/60 hover:text-white'
                     }`}
                   >
-                    {item.label}
+                    {isActive ? (
+                      <span className="absolute inset-0 rounded-full border border-white/10 bg-white/[0.06]" />
+                    ) : null}
+                    <span className="relative">{item.label}</span>
                   </a>
                 )
               })}
@@ -236,9 +321,10 @@ export default function App() {
 
             <a
               href="#contact"
-              className="hidden sm:inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white/90 hover:bg-white/10 transition-colors"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-accent-soft transition-colors"
             >
               Let&apos;s talk
+              <span aria-hidden="true">→</span>
             </a>
           </div>
         </div>
@@ -248,28 +334,37 @@ export default function App() {
         <section id="home" className="min-h-[calc(100svh-72px)] pt-24 pb-16 flex items-center">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1">
+              <div className="order-2 lg:order-1 reveal">
                 <div className="relative mx-auto w-fit">
-                  <div className="absolute -inset-6 rounded-[32px] bg-gradient-to-r from-fuchsia-500/35 via-cyan-400/25 to-amber-400/25 blur-2xl" />
-                  <div className="relative rounded-[32px] border border-white/10 bg-transparent p-2">
+                  <div className="absolute -inset-8 rounded-[36px] bg-[radial-gradient(circle_at_30%_30%,rgba(34,211,238,0.35),transparent_60%)] blur-2xl" />
+                  <div className="relative rounded-[32px] border border-white/10 bg-white/[0.03] p-2 backdrop-blur-sm">
                     <img
                       src={`${baseUrl}imgs/pfp.svg`}
-                      alt="BannDev profile picture"
+                      alt="Portrait of DevBann"
                       className="h-52 w-52 sm:h-64 sm:w-64 lg:h-80 lg:w-80 object-contain bg-transparent rounded-3xl"
                     />
+                  </div>
+                  <div className="absolute -bottom-3 -right-3 rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-2 backdrop-blur-md">
+                    <div className="flex items-center gap-2 text-xs font-medium text-white/80">
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+                      </span>
+                      Available for work
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="order-1 lg:order-2">
-                <div className="flex flex-wrap gap-3">
-                  <Pill>ReactJS + Tailwind</Pill>
+              <div className="order-1 lg:order-2 reveal">
+                <div className="flex flex-wrap gap-2.5">
+                  <Pill>React + Tailwind</Pill>
                   <Pill>Professional UI</Pill>
-                  <Pill>Scroll-reactive animations</Pill>
+                  <Pill>Scroll-reactive motion</Pill>
                 </div>
 
-                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-3xl sm:text-4xl lg:text-6xl font-semibold leading-[1.05]">
-                  <span className="text-white/90 whitespace-nowrap">I craft</span>
+                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.03]">
+                  <span className="text-white whitespace-nowrap">I craft</span>
                   <RotatingTypeCycle
                     phrases={ROLE_PHRASES as unknown as string[]}
                     typeMs={65}
@@ -277,23 +372,27 @@ export default function App() {
                     holdMs={700}
                     minChars={ROLE_MAX_CHARS + 1}
                   />
-                  <span className="text-white/90 whitespace-nowrap">for people.</span>
+                  <span className="text-white whitespace-nowrap">for people.</span>
                 </h1>
 
-                {/* Intentionally no extra hero description on the smallest screens (keeps layout tight). */}
+                <p className="mt-6 max-w-md text-base sm:text-lg text-white/60 leading-relaxed text-pretty">
+                  Front-end designer and engineer focused on clean, accessible interfaces — from
+                  dashboards and PWAs to production tooling that people actually enjoy using.
+                </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
                   <a
                     href="#projects"
-                    className="inline-flex items-center rounded-xl bg-white text-slate-950 px-5 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
+                    className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-950 px-5 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
                   >
                     View Projects
+                    <span aria-hidden="true">→</span>
                   </a>
                   <a
-                    href="#tech"
-                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 transition-colors"
+                    href="#contact"
+                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/[0.08] hover:border-white/20 transition-colors"
                   >
-                    Tech Stack
+                    Get in touch
                   </a>
                 </div>
               </div>
@@ -301,88 +400,110 @@ export default function App() {
           </div>
         </section>
 
-        <section id="whatido" className="py-16">
+        <section id="whatido" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="grid gap-10 lg:grid-cols-2 lg:items-stretch">
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-10">
-                <h2 className="text-3xl font-semibold">What I do</h2>
-                <p className="mt-3 text-white/70 max-w-xl">
-                  I design and build professional front-end experiences with clean structure, modern styling, and
-                  motion that adds clarity.
+            <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
+              <div className="reveal rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10">
+                <div className="text-xs font-medium uppercase tracking-[0.2em] text-accent">What I do</div>
+                <h2 className="mt-4 text-2xl sm:text-3xl font-semibold text-white text-balance">
+                  Design and engineering, working as one
+                </h2>
+                <p className="mt-3 text-white/60 max-w-xl leading-relaxed">
+                  I build professional front-end experiences with clean structure, modern styling, and motion
+                  that adds clarity instead of noise.
                 </p>
 
-                <div className="mt-8 grid gap-4">
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                    <div className="font-semibold text-white/90">Clean, scalable UI</div>
-                    <div className="mt-1 text-sm text-white/70">
-                      Tailwind-first layouts with consistent spacing, typography, and accessibility.
+                <div className="mt-8 grid gap-3">
+                  {[
+                    {
+                      title: 'Clean, scalable UI',
+                      desc: 'Tailwind-first layouts with consistent spacing, typography, and accessibility.',
+                    },
+                    {
+                      title: 'Motion that means something',
+                      desc: 'Scroll-reactive effects that guide attention, never distract from content.',
+                    },
+                    {
+                      title: 'Practical front-end engineering',
+                      desc: 'Components, forms, and responsive behavior built for real users.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      className="group flex gap-4 rounded-2xl border border-white/[0.06] bg-slate-900/40 p-4 transition-colors hover:border-accent/25"
+                    >
+                      <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-accent/25 bg-accent/10 text-accent transition-transform group-hover:scale-110">
+                        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                      </span>
+                      <div>
+                        <div className="font-semibold text-white/90">{item.title}</div>
+                        <div className="mt-1 text-sm text-white/60 leading-relaxed">{item.desc}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                    <div className="font-semibold text-white/90">Motion that means something</div>
-                    <div className="mt-1 text-sm text-white/70">
-                      Scroll-reactive effects that guide attention (not distract from content).
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                    <div className="font-semibold text-white/90">Practical front-end engineering</div>
-                    <div className="mt-1 text-sm text-white/70">
-                      Components, forms, and responsive behavior built for real users.
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-2">
-                  <span className="text-xs text-white/60">Currently: building</span>
-                  <span className="text-xs rounded-full px-3 py-1 border border-white/10 bg-white/5 text-white/80">
+                <div className="mt-6 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-white/50">Currently building</span>
+                  <span className="text-xs rounded-full px-3 py-1 border border-white/10 bg-white/[0.04] text-white/75">
                     portfolios, dashboards, landing pages
                   </span>
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-10 h-full">
-                <div className="text-sm uppercase tracking-widest text-white/60">Highlights</div>
-                <div className="mt-4 grid gap-4">
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                    <div className="font-semibold text-white/90">UI polish</div>
-                    <div className="mt-1 text-sm text-white/70">
-                      Consistent spacing, typography, and micro-interactions for a premium feel.
+              <div className="reveal rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10 h-full">
+                <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Highlights</div>
+                <div className="mt-6 grid gap-3">
+                  {[
+                    {
+                      stat: '100%',
+                      title: 'UI polish',
+                      desc: 'Consistent spacing, typography, and micro-interactions for a premium feel.',
+                    },
+                    {
+                      stat: 'Mobile-first',
+                      title: 'Responsive by default',
+                      desc: 'Clean layouts that scale from mobile to desktop without breaking.',
+                    },
+                    {
+                      stat: 'Vite',
+                      title: 'Fast builds',
+                      desc: 'Modern tooling for quick iterations and smooth developer UX.',
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.title}
+                      className="rounded-2xl border border-white/[0.06] bg-slate-900/40 p-5 transition-colors hover:border-white/15"
+                    >
+                      <div className="font-display text-lg font-semibold text-accent">{item.stat}</div>
+                      <div className="mt-1 font-semibold text-white/90">{item.title}</div>
+                      <div className="mt-1 text-sm text-white/60 leading-relaxed">{item.desc}</div>
                     </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                    <div className="font-semibold text-white/90">Responsive by default</div>
-                    <div className="mt-1 text-sm text-white/70">
-                      Clean layouts that scale from mobile to desktop without breaking.
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-slate-900/30 p-4">
-                    <div className="font-semibold text-white/90">Fast builds</div>
-                    <div className="mt-1 text-sm text-white/70">
-                      Vite + modern tooling for quick iterations and smooth UX.
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="skills" className="py-16">
+        <section id="skills" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="flex items-end justify-between gap-6 flex-wrap">
-              <div>
-                <h2 className="text-3xl font-semibold">Skills</h2>
-                <p className="mt-2 text-white/70 max-w-2xl">
-                  A focused set of tools for designing, building, and polishing front-end experiences.
-                </p>
-              </div>
-              <div className="hidden md:block text-right">
-                <div className="text-xs uppercase tracking-widest text-white/50">Approach</div>
-                <div className="mt-1 text-sm text-white/80">Design + engineering, together.</div>
-              </div>
+            <div className="reveal">
+              <SectionHeader
+                index="01"
+                eyebrow="Skills"
+                title="Tools for building polished experiences"
+                desc="A focused toolkit for designing, building, and refining front-end experiences end to end."
+                aside={
+                  <div className="hidden md:block text-right">
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/40">Approach</div>
+                    <div className="mt-1 text-sm text-white/70">Design + engineering, together</div>
+                  </div>
+                }
+              />
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
                 { title: 'React Components', desc: 'Reusable patterns, clean state, predictable UI.' },
                 { title: 'Tailwind Styling', desc: 'Design systems using utility classes and layers.' },
@@ -390,32 +511,36 @@ export default function App() {
                 { title: 'Responsive Layouts', desc: 'Mobile-first structure with careful typography.' },
                 { title: 'Forms & Validation', desc: 'User-friendly interactions and accessible controls.' },
                 { title: 'Performance Mindset', desc: 'Avoid unnecessary renders and keep it smooth.' },
-              ].map((s) => (
+              ].map((s, i) => (
                 <div
                   key={s.title}
-                  className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/25 transition-colors"
+                  className="reveal card-sheen group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-colors hover:border-accent/30"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative">
+                  <div className="flex items-start justify-between">
                     <div className="text-lg font-semibold text-white">{s.title}</div>
-                    <div className="mt-2 text-sm text-white/70">{s.desc}</div>
+                    <span className="font-mono text-xs text-white/25 transition-colors group-hover:text-accent/70">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
                   </div>
+                  <div className="mt-2 text-sm text-white/60 leading-relaxed">{s.desc}</div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section id="projects" className="py-16">
+        <section id="projects" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div>
-              <h2 className="text-3xl font-semibold">Projects</h2>
-              <p className="mt-2 text-white/70 max-w-2xl">
-                A selection of real-world apps I&apos;ve built, spanning print tooling, drone operations, and secure team messaging.
-              </p>
+            <div className="reveal">
+              <SectionHeader
+                index="02"
+                eyebrow="Projects"
+                title="Selected work"
+                desc="Real-world apps I've built, spanning print tooling, drone operations, and secure team messaging."
+              />
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-2">
+            <div className="mt-12 grid gap-4 md:grid-cols-2">
               {[
                 {
                   title: 'Sticker Generator',
@@ -436,42 +561,60 @@ export default function App() {
                   href: null,
                   note: 'Local Production',
                 },
-              ].map((p) => (
+              ].map((p, i) => (
                 <div
                   key={p.title}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-6 hover:border-white/25 transition-colors"
+                  className="reveal card-sheen group flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-7 transition-colors hover:border-accent/30"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="text-lg font-semibold text-white">{p.title}</div>
-                      <div className="mt-2 text-sm text-white/70">{p.desc}</div>
+                      <span className="font-mono text-xs text-accent/70">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <h3 className="mt-1 text-xl font-semibold text-white transition-colors group-hover:text-accent-soft">
+                        {p.title}
+                      </h3>
                     </div>
-                    <div className="shrink-0 rounded-xl border border-white/10 bg-slate-950/40 px-3 py-2 text-xs text-white/70">
-                      Featured
-                    </div>
+                    <span
+                      className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium ${
+                        p.href
+                          ? 'border-accent/25 bg-accent/10 text-accent'
+                          : 'border-white/10 bg-white/[0.04] text-white/50'
+                      }`}
+                    >
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                      {p.href ? 'Live' : p.note ?? 'Private'}
+                    </span>
                   </div>
+
+                  <p className="mt-3 text-sm text-white/60 leading-relaxed">{p.desc}</p>
+
                   <div className="mt-5 flex flex-wrap gap-2">
                     {p.tags.map((t) => (
                       <span
                         key={t}
-                        className="text-xs rounded-full border border-white/10 bg-white/5 px-3 py-1 text-white/80"
+                        className="text-xs rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-white/70"
                       >
                         {t}
                       </span>
                     ))}
                   </div>
-                  <div className="mt-6">
+
+                  <div className="mt-6 pt-5 border-t border-white/[0.06]">
                     {p.href ? (
                       <a
                         href={p.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm font-semibold text-white/90 hover:text-white inline-flex items-center gap-2"
+                        className="group/link text-sm font-semibold text-white/90 hover:text-accent inline-flex items-center gap-2 transition-colors"
                       >
-                        View live <span aria-hidden="true">↗</span>
+                        View live
+                        <span aria-hidden="true" className="transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5">
+                          ↗
+                        </span>
                       </a>
                     ) : (
-                      <span className="text-sm font-semibold text-white/50 inline-flex items-center gap-2">
+                      <span className="text-sm font-medium text-white/40 inline-flex items-center gap-2">
                         {p.note ?? 'Private project'}
                       </span>
                     )}
@@ -482,19 +625,21 @@ export default function App() {
           </div>
         </section>
 
-        <section id="tech" className="py-16">
+        <section id="tech" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div>
-              <h2 className="text-3xl font-semibold">Tech Stack</h2>
-              <p className="mt-2 text-white/70 max-w-2xl">
-                The tools I use most often to build clean, modern experiences.
-              </p>
+            <div className="reveal">
+              <SectionHeader
+                index="03"
+                eyebrow="Tech Stack"
+                title="What I build with"
+                desc="The tools I reach for most often to ship clean, modern experiences."
+              />
             </div>
 
-            <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {[
                 {
-                  title: 'Programming Languages',
+                  title: 'Languages',
                   items: ['TypeScript', 'JavaScript', 'HTML', 'CSS3', 'PHP'],
                 },
                 { title: 'Databases', items: ['MySQL', 'PostgreSQL', 'SQLite', 'MongoDB'] },
@@ -506,22 +651,21 @@ export default function App() {
                   title: 'Frameworks',
                   items: ['React', 'TailwindCSS', 'Vite', 'WordPress', 'Elementor', 'Elementor Pro'],
                 },
-              ].map((group, groupIdx) => (
+              ].map((group) => (
                 <div
                   key={group.title}
-                  className="rounded-3xl border border-white/10 bg-white/5 p-6 hover:border-white/25 transition-colors"
+                  className="reveal rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-colors hover:border-accent/25"
                 >
                   <div className="flex items-center justify-between gap-4">
-                    <div className="text-sm font-semibold text-white/90">{group.title}</div>
-                    <div className="text-xs text-white/50">{group.items.length} items</div>
+                    <div className="font-display text-sm font-semibold text-white">{group.title}</div>
+                    <div className="font-mono text-xs text-white/35">{group.items.length}</div>
                   </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {group.items.map((t, idx) => (
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {group.items.map((t) => (
                       <span
                         key={t}
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/85 hover:bg-white/10 transition-colors"
-                        style={{ transform: `translateY(${((idx + groupIdx) % 3) * 1}px)` }}
+                        className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/75 hover:border-accent/30 hover:text-white transition-colors"
                       >
                         {t}
                       </span>
@@ -533,36 +677,50 @@ export default function App() {
           </div>
         </section>
 
-        <section id="contact" className="py-16">
+        <section id="contact" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
-              <div>
-                <h2 className="text-3xl font-semibold">Contact us</h2>
-                <p className="mt-2 text-white/70 max-w-xl">
-                  Want a formal, professional one-pager (with animations that actually look good)? Send a message below.
+              <div className="reveal">
+                <div className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Contact</div>
+                <h2 className="mt-4 text-3xl sm:text-4xl font-semibold text-white text-balance">
+                  Let&apos;s build something great
+                </h2>
+                <p className="mt-3 text-white/60 max-w-md leading-relaxed">
+                  Want a formal, professional one-pager with motion that actually looks good? Tell me about
+                  your project and I&apos;ll get back to you.
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="mt-8 space-y-3">
                   <a
                     href={`mailto:${CONTACT_EMAIL}`}
-                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white/90 hover:bg-white/10 transition-colors"
+                    className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 hover:border-accent/30 transition-colors"
                   >
-                    Email: {CONTACT_EMAIL}
+                    <span className="grid h-10 w-10 place-items-center rounded-xl border border-accent/25 bg-accent/10 text-accent">
+                      @
+                    </span>
+                    <div>
+                      <div className="text-xs uppercase tracking-wider text-white/40">Email</div>
+                      <div className="text-sm font-semibold text-white/90 group-hover:text-accent-soft transition-colors">
+                        {CONTACT_EMAIL}
+                      </div>
+                    </div>
                   </a>
                 </div>
               </div>
 
-              <ContactForm />
-            </div>
-
-            <div className="mt-12 text-xs text-white/50">
+              <div className="reveal">
+                <ContactForm />
+              </div>
             </div>
           </div>
         </section>
 
-        <footer className="py-10 border-t border-white/10 bg-slate-950/30">
-          <div className="mx-auto max-w-6xl px-4 flex items-center justify-center">
-            <div className="text-sm text-white/70">© {new Date().getFullYear()} BannDev. All rights reserved.</div>
+        <footer className="py-10 border-t border-white/[0.06] bg-slate-950/30">
+          <div className="mx-auto max-w-6xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <HeaderBrand />
+            <div className="text-sm text-white/50">
+              © {new Date().getFullYear()} DevBann. All rights reserved.
+            </div>
           </div>
         </footer>
       </main>
@@ -581,7 +739,7 @@ function ContactForm() {
   const canSubmit = name.trim().length >= 2 && email.includes('@') && message.trim().length >= 10
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 sm:p-8">
+    <div className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -627,8 +785,8 @@ function ContactForm() {
             name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm outline-none focus:border-fuchsia-400/50"
-            placeholder="BannDev fan (example)"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm outline-none transition-colors focus:border-accent/60 focus:ring-1 focus:ring-accent/40"
+            placeholder="Your name"
             required
           />
         </div>
@@ -639,7 +797,7 @@ function ContactForm() {
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm outline-none focus:border-fuchsia-400/50"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm outline-none transition-colors focus:border-accent/60 focus:ring-1 focus:ring-accent/40"
             placeholder="you@example.com"
             required
             type="email"
@@ -652,7 +810,7 @@ function ContactForm() {
             name="message"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="mt-2 w-full min-h-[120px] rounded-xl border border-white/10 bg-slate-950/30 px-4 py-3 text-sm outline-none focus:border-fuchsia-400/50"
+            className="mt-2 w-full min-h-[120px] rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm outline-none transition-colors focus:border-accent/60 focus:ring-1 focus:ring-accent/40"
             placeholder="Tell me what you want to build..."
             required
           />
