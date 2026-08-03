@@ -247,10 +247,15 @@ function SectionHeader({
 }
 
 function HeaderBrand() {
+  const baseUrl = import.meta.env.BASE_URL
   return (
     <a href="#home" className="group inline-flex items-center gap-2 font-display font-semibold tracking-tight text-white">
-      <span className="grid h-8 w-8 place-items-center rounded-lg border border-accent/30 bg-accent/10 text-sm text-accent">
-        B
+      <span className="grid h-9 w-9 place-items-center overflow-hidden rounded-lg border border-accent/30 bg-accent/10">
+        <img
+          src={`${baseUrl}imgs/logo.png`}
+          alt="DevBann logo"
+          className="h-full w-full object-contain"
+        />
       </span>
       DevBann
     </a>
@@ -339,8 +344,8 @@ export default function App() {
                   <div className="absolute -inset-8 rounded-[36px] bg-[radial-gradient(circle_at_30%_30%,rgba(34,211,238,0.35),transparent_60%)] blur-2xl" />
                   <div className="relative rounded-[32px] border border-white/10 bg-white/[0.03] p-2 backdrop-blur-sm">
                     <img
-                      src={`${baseUrl}imgs/pfp.svg`}
-                      alt="Portrait of DevBann"
+                      src={`${baseUrl}imgs/logo.png`}
+                      alt="DevBann mascot — a coding polar bear"
                       className="h-52 w-52 sm:h-64 sm:w-64 lg:h-80 lg:w-80 object-contain bg-transparent rounded-3xl"
                     />
                   </div>
