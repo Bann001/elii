@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'motion/react'
 import ChatBot from './ChatBot'
+import { Reveal } from './motion'
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
@@ -169,54 +177,6 @@ function Pill({ children }: { children: ReactNode }) {
   )
 }
 
-function useReveal() {
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const els = Array.from(document.querySelectorAll<HTMLElement>('.reveal'))
-    if (!els.length) return
-
-    if (
-      window.matchMedia &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    ) {
-      els.forEach((el) => el.classList.add('is-visible'))
-      return
-    }
-
-    if (typeof IntersectionObserver === 'undefined') {
-      els.forEach((el) => el.classList.add('is-visible'))
-      return
-    }
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible')
-            io.unobserve(entry.target)
-          }
-        }
-      },
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.12 },
-    )
-
-    els.forEach((el) => io.observe(el))
-
-    // Safety net: if anything remains hidden after a few seconds
-    // (e.g. observer never fires), force it visible so content is never lost.
-    const fallback = window.setTimeout(() => {
-      document
-        .querySelectorAll<HTMLElement>('.reveal:not(.is-visible)')
-        .forEach((el) => el.classList.add('is-visible'))
-    }, 3000)
-
-    return () => {
-      io.disconnect()
-      window.clearTimeout(fallback)
-    }
-  }, [])
-}
-
 function SectionHeader({
   index,
   eyebrow,
@@ -262,9 +222,251 @@ function HeaderBrand() {
   )
 }
 
+/**
+ * Pinned scroll-storytelling hero.
+ *
+ * The section is tall; an inner panel sticks to the viewport while the story
+ * plays out in three scroll-driven beats:
+ *   1. Oversized mascot zooms in with a greeting.
+ *   2. The headline assembles as the mascot settles to the side.
+ *   3. The pitch, tags, and calls-to-action arrive to form the final layout.
+ * A reduced-motion fallback renders the finished composition statically.
+ */
+function HeroStory() {
+  const baseUrl = import.meta.env.BASE_URL
+  const reduce = useReducedMotion()
+  const sectionRef = useRef<HTMLDivElement | null>(null)
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end end'],
+  })
+  const p = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 28,
+    mass: 0.4,
+  })
+
+  // Mascot: zoom in, settle, and drift with a subtle tilt.
+  const mascotScale = useTransform(p, [0, 0.55], [1.5, 1])
+  const mascotRotate = useTransform(p, [0, 1], [-8, 5])
+  const mascotY = useTransform(p, [0, 1], [40, -40])
+  const glowScale = useTransform(p, [0, 0.55], [1.4, 1])
+
+  // Beat 1 — greeting.
+  const greetOpacity = useTransform(p, [0, 0.16, 0.26], [1, 1, 0])
+  const greetY = useTransform(p, [0, 0.26], [0, -28])
+
+  // Beat 2 — headline.
+  const titleOpacity = useTransform(p, [0.2, 0.42], [0, 1])
+  const titleY = useTransform(p, [0.2, 0.42], [44, 0])
+
+  // Beat 3 — details + CTAs.
+  const detailOpacity = useTransform(p, [0.56, 0.82], [0, 1])
+  const detailY = useTransform(p, [0.56, 0.82], [44, 0])
+
+  // Scroll hint fades quickly once the journey begins.
+  const hintOpacity = useTransform(p, [0, 0.08], [1, 0])
+
+  if (reduce) {
+    return (
+      <section id="home" className="pt-24 pb-16">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+            <MascotCard baseUrl={baseUrl} />
+            <HeroCopy />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section id="home" ref={sectionRef} className="relative h-[280vh]">
+      <div className="sticky top-0 flex h-screen items-center overflow-hidden">
+        <div className="mx-auto w-full max-w-6xl px-4">
+          <div className="grid items-center gap-8 md:grid-cols-2 md:gap-10">
+            {/* Mascot */}
+            <div className="order-2 md:order-1">
+              <motion.div
+                style={{ scale: mascotScale, rotate: mascotRotate, y: mascotY }}
+                className="relative mx-auto w-fit"
+              >
+                <motion.div
+                  style={{ scale: glowScale }}
+                  className="absolute -inset-8 rounded-[36px] bg-[radial-gradient(circle_at_30%_30%,rgba(34,211,238,0.35),transparent_60%)] blur-2xl"
+                />
+                <div className="relative rounded-[32px] border border-white/10 bg-white/[0.03] p-2 backdrop-blur-sm">
+                  <img
+                    src={`${baseUrl}imgs/logo.png`}
+                    alt="DevBann mascot — a coding polar bear"
+                    className="h-44 w-44 sm:h-56 sm:w-56 lg:h-72 lg:w-72 object-contain bg-transparent rounded-3xl"
+                  />
+                </div>
+                <motion.div
+                  style={{ opacity: detailOpacity }}
+                  className="absolute -bottom-3 -right-3 rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-2 backdrop-blur-md"
+                >
+                  <div className="flex items-center gap-2 text-xs font-medium text-white/80">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+                    </span>
+                    Available for work
+                  </div>
+                </motion.div>
+              </motion.div>
+            </div>
+
+            {/* Story copy */}
+            <div className="relative order-1 md:order-2 min-h-[20rem]">
+              <motion.p
+                style={{ opacity: greetOpacity, y: greetY }}
+                className="text-sm font-medium uppercase tracking-[0.25em] text-accent"
+              >
+                Hi, I&apos;m DevBann
+              </motion.p>
+
+              <motion.div style={{ opacity: titleOpacity, y: titleY }} className="mt-4">
+                <div className="flex flex-wrap gap-2.5">
+                  <Pill>React + Tailwind</Pill>
+                  <Pill>Professional UI</Pill>
+                  <Pill>Scroll-reactive motion</Pill>
+                </div>
+
+                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.03]">
+                  <span className="text-white whitespace-nowrap">I craft</span>
+                  <RotatingTypeCycle
+                    phrases={ROLE_PHRASES as unknown as string[]}
+                    typeMs={65}
+                    deleteMs={32}
+                    holdMs={700}
+                    minChars={ROLE_MAX_CHARS + 1}
+                  />
+                  <span className="text-white whitespace-nowrap">for people.</span>
+                </h1>
+              </motion.div>
+
+              <motion.div style={{ opacity: detailOpacity, y: detailY }}>
+                <p className="mt-6 max-w-md text-base sm:text-lg text-white/60 leading-relaxed text-pretty">
+                  Front-end designer and engineer focused on clean, accessible interfaces — from
+                  dashboards and PWAs to production tooling that people actually enjoy using.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <a
+                    href="#projects"
+                    className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-950 px-5 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
+                  >
+                    View Projects
+                    <span aria-hidden="true">→</span>
+                  </a>
+                  <a
+                    href="#contact"
+                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/[0.08] hover:border-white/20 transition-colors"
+                  >
+                    Get in touch
+                  </a>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll hint */}
+        <motion.div
+          style={{ opacity: hintOpacity }}
+          className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/40"
+        >
+          Scroll to explore
+          <span className="grid h-8 w-5 place-items-start rounded-full border border-white/20 p-1">
+            <motion.span
+              className="h-1.5 w-1 rounded-full bg-accent"
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </span>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+/** Static mascot card used by the reduced-motion hero fallback. */
+function MascotCard({ baseUrl }: { baseUrl: string }) {
+  return (
+    <div className="order-2 lg:order-1">
+      <div className="relative mx-auto w-fit">
+        <div className="absolute -inset-8 rounded-[36px] bg-[radial-gradient(circle_at_30%_30%,rgba(34,211,238,0.35),transparent_60%)] blur-2xl" />
+        <div className="relative rounded-[32px] border border-white/10 bg-white/[0.03] p-2 backdrop-blur-sm">
+          <img
+            src={`${baseUrl}imgs/logo.png`}
+            alt="DevBann mascot — a coding polar bear"
+            className="h-52 w-52 sm:h-64 sm:w-64 lg:h-80 lg:w-80 object-contain bg-transparent rounded-3xl"
+          />
+        </div>
+        <div className="absolute -bottom-3 -right-3 rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-2 backdrop-blur-md">
+          <div className="flex items-center gap-2 text-xs font-medium text-white/80">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
+            </span>
+            Available for work
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Static hero copy used by the reduced-motion hero fallback. */
+function HeroCopy() {
+  return (
+    <div className="order-1 lg:order-2">
+      <div className="flex flex-wrap gap-2.5">
+        <Pill>React + Tailwind</Pill>
+        <Pill>Professional UI</Pill>
+        <Pill>Scroll-reactive motion</Pill>
+      </div>
+
+      <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.03]">
+        <span className="text-white whitespace-nowrap">I craft</span>
+        <RotatingTypeCycle
+          phrases={ROLE_PHRASES as unknown as string[]}
+          typeMs={65}
+          deleteMs={32}
+          holdMs={700}
+          minChars={ROLE_MAX_CHARS + 1}
+        />
+        <span className="text-white whitespace-nowrap">for people.</span>
+      </h1>
+
+      <p className="mt-6 max-w-md text-base sm:text-lg text-white/60 leading-relaxed text-pretty">
+        Front-end designer and engineer focused on clean, accessible interfaces — from dashboards
+        and PWAs to production tooling that people actually enjoy using.
+      </p>
+
+      <div className="mt-8 flex flex-wrap gap-3">
+        <a
+          href="#projects"
+          className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-950 px-5 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
+        >
+          View Projects
+          <span aria-hidden="true">→</span>
+        </a>
+        <a
+          href="#contact"
+          className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/[0.08] hover:border-white/20 transition-colors"
+        >
+          Get in touch
+        </a>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [activeHref, setActiveHref] = useState('#home')
-  const baseUrl = import.meta.env.BASE_URL
 
   const sectionIds = useMemo(() => NAV_ITEMS.map((n) => n.href.replace('#', '')), [])
 
@@ -290,10 +492,8 @@ export default function App() {
     return () => io.disconnect()
   }, [sectionIds])
 
-  useReveal()
-
   return (
-    <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-hidden">
+    <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-x-clip">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,_rgba(34,211,238,0.14),_transparent_60%)]" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_75%)] opacity-30" />
@@ -336,79 +536,15 @@ export default function App() {
       </header>
 
       <main className="relative">
-        <section id="home" className="min-h-[calc(100svh-72px)] pt-24 pb-16 flex items-center">
-          <div className="mx-auto max-w-6xl px-4">
-            <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1 reveal">
-                <div className="relative mx-auto w-fit">
-                  <div className="absolute -inset-8 rounded-[36px] bg-[radial-gradient(circle_at_30%_30%,rgba(34,211,238,0.35),transparent_60%)] blur-2xl" />
-                  <div className="relative rounded-[32px] border border-white/10 bg-white/[0.03] p-2 backdrop-blur-sm">
-                    <img
-                      src={`${baseUrl}imgs/logo.png`}
-                      alt="DevBann mascot — a coding polar bear"
-                      className="h-52 w-52 sm:h-64 sm:w-64 lg:h-80 lg:w-80 object-contain bg-transparent rounded-3xl"
-                    />
-                  </div>
-                  <div className="absolute -bottom-3 -right-3 rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-2 backdrop-blur-md">
-                    <div className="flex items-center gap-2 text-xs font-medium text-white/80">
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
-                        <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
-                      </span>
-                      Available for work
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="order-1 lg:order-2 reveal">
-                <div className="flex flex-wrap gap-2.5">
-                  <Pill>React + Tailwind</Pill>
-                  <Pill>Professional UI</Pill>
-                  <Pill>Scroll-reactive motion</Pill>
-                </div>
-
-                <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.03]">
-                  <span className="text-white whitespace-nowrap">I craft</span>
-                  <RotatingTypeCycle
-                    phrases={ROLE_PHRASES as unknown as string[]}
-                    typeMs={65}
-                    deleteMs={32}
-                    holdMs={700}
-                    minChars={ROLE_MAX_CHARS + 1}
-                  />
-                  <span className="text-white whitespace-nowrap">for people.</span>
-                </h1>
-
-                <p className="mt-6 max-w-md text-base sm:text-lg text-white/60 leading-relaxed text-pretty">
-                  Front-end designer and engineer focused on clean, accessible interfaces — from
-                  dashboards and PWAs to production tooling that people actually enjoy using.
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <a
-                    href="#projects"
-                    className="inline-flex items-center gap-2 rounded-xl bg-white text-slate-950 px-5 py-3 text-sm font-semibold hover:bg-white/90 transition-colors"
-                  >
-                    View Projects
-                    <span aria-hidden="true">→</span>
-                  </a>
-                  <a
-                    href="#contact"
-                    className="inline-flex items-center rounded-xl border border-white/10 bg-white/[0.04] px-5 py-3 text-sm font-semibold text-white/90 hover:bg-white/[0.08] hover:border-white/20 transition-colors"
-                  >
-                    Get in touch
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HeroStory />
 
         <section id="whatido" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
-              <div className="reveal rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10">
+              <Reveal
+                direction="right"
+                className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10"
+              >
                 <div className="text-xs font-medium uppercase tracking-[0.2em] text-accent">What I do</div>
                 <h2 className="mt-4 text-2xl sm:text-3xl font-semibold text-white text-balance">
                   Design and engineering, working as one
@@ -454,9 +590,13 @@ export default function App() {
                     portfolios, dashboards, landing pages
                   </span>
                 </div>
-              </div>
+              </Reveal>
 
-              <div className="reveal rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10 h-full">
+              <Reveal
+                direction="left"
+                delay={0.1}
+                className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10 h-full"
+              >
                 <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Highlights</div>
                 <div className="mt-6 grid gap-3">
                   {[
@@ -486,14 +626,14 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>
 
         <section id="skills" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="reveal">
+            <Reveal>
               <SectionHeader
                 index="01"
                 eyebrow="Skills"
@@ -506,7 +646,7 @@ export default function App() {
                   </div>
                 }
               />
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
@@ -517,9 +657,10 @@ export default function App() {
                 { title: 'Forms & Validation', desc: 'User-friendly interactions and accessible controls.' },
                 { title: 'Performance Mindset', desc: 'Avoid unnecessary renders and keep it smooth.' },
               ].map((s, i) => (
-                <div
+                <Reveal
                   key={s.title}
-                  className="reveal card-sheen group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-colors hover:border-accent/30"
+                  delay={(i % 3) * 0.08}
+                  className="card-sheen group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-colors hover:border-accent/30"
                 >
                   <div className="flex items-start justify-between">
                     <div className="text-lg font-semibold text-white">{s.title}</div>
@@ -528,7 +669,7 @@ export default function App() {
                     </span>
                   </div>
                   <div className="mt-2 text-sm text-white/60 leading-relaxed">{s.desc}</div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -536,14 +677,14 @@ export default function App() {
 
         <section id="projects" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="reveal">
+            <Reveal>
               <SectionHeader
                 index="02"
                 eyebrow="Projects"
                 title="Selected work"
                 desc="Real-world apps I've built, spanning print tooling, drone operations, and secure team messaging."
               />
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid gap-4 md:grid-cols-2">
               {[
@@ -567,9 +708,10 @@ export default function App() {
                   note: 'Local Production',
                 },
               ].map((p, i) => (
-                <div
+                <Reveal
                   key={p.title}
-                  className="reveal card-sheen group flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-7 transition-colors hover:border-accent/30"
+                  delay={(i % 2) * 0.1}
+                  className="card-sheen group flex flex-col rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-7 transition-colors hover:border-accent/30"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
@@ -624,7 +766,7 @@ export default function App() {
                       </span>
                     )}
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -632,14 +774,14 @@ export default function App() {
 
         <section id="tech" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
-            <div className="reveal">
+            <Reveal>
               <SectionHeader
                 index="03"
                 eyebrow="Tech Stack"
                 title="What I build with"
                 desc="The tools I reach for most often to ship clean, modern experiences."
               />
-            </div>
+            </Reveal>
 
             <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {[
@@ -656,10 +798,11 @@ export default function App() {
                   title: 'Frameworks',
                   items: ['React', 'TailwindCSS', 'Vite', 'WordPress', 'Elementor', 'Elementor Pro'],
                 },
-              ].map((group) => (
-                <div
+              ].map((group, i) => (
+                <Reveal
                   key={group.title}
-                  className="reveal rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-colors hover:border-accent/25"
+                  delay={(i % 4) * 0.07}
+                  className="rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-colors hover:border-accent/25"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="font-display text-sm font-semibold text-white">{group.title}</div>
@@ -676,7 +819,7 @@ export default function App() {
                       </span>
                     ))}
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -685,7 +828,7 @@ export default function App() {
         <section id="contact" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
-              <div className="reveal">
+              <Reveal direction="right">
                 <div className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Contact</div>
                 <h2 className="mt-4 text-3xl sm:text-4xl font-semibold text-white text-balance">
                   Let&apos;s build something great
@@ -711,11 +854,11 @@ export default function App() {
                     </div>
                   </a>
                 </div>
-              </div>
+              </Reveal>
 
-              <div className="reveal">
+              <Reveal direction="left" delay={0.1}>
                 <ContactForm />
-              </div>
+              </Reveal>
             </div>
           </div>
         </section>
@@ -832,4 +975,3 @@ function ContactForm() {
     </div>
   )
 }
-
