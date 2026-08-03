@@ -421,16 +421,20 @@ export default function App() {
                   title: 'Sticker Generator',
                   desc: 'A web app for generating A4 label sheets — design custom stickers with product info, logos, and QR codes on the "Create" page, or generate RPU drone sticker sheets with mixed or uniform label sizes on the RPU page. Both export print-ready PDFs with canvas-rendered stickers at 300 DPI.',
                   tags: ['React', 'Canvas', 'PDF Export', 'QR Codes'],
+                  href: 'https://bann001.github.io/hr-sticker',
                 },
                 {
                   title: 'ATOMS',
                   desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. It reads live data from a Supabase backend (vtiger CRM sync), uses Mapbox GL for maps, React Query for data fetching, shadcn/ui for components, and Tailwind for styling.',
                   tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
+                  href: 'https://atoms.agridomcorp.com',
                 },
                 {
                   title: 'SF Talk',
                   desc: 'A secure, self-hosted company messaging platform built with an Express.js + MySQL backend and a React/Vite frontend. It features real-time messaging with Socket.io, user authentication, OR-based search, batch inserts, and full JSON column handling — replacing a PocketBase backend with a custom Node.js server for greater control and scalability.',
                   tags: ['Express.js', 'MySQL', 'Socket.io', 'React', 'Vite'],
+                  href: null,
+                  note: 'Local Production',
                 },
               ].map((p) => (
                 <div
@@ -457,12 +461,20 @@ export default function App() {
                     ))}
                   </div>
                   <div className="mt-6">
-                    <a
-                      href="#contact"
-                      className="text-sm font-semibold text-white/90 hover:text-white inline-flex items-center gap-2"
-                    >
-                      Ask for a demo <span aria-hidden="true">→</span>
-                    </a>
+                    {p.href ? (
+                      <a
+                        href={p.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-semibold text-white/90 hover:text-white inline-flex items-center gap-2"
+                      >
+                        View live <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span className="text-sm font-semibold text-white/50 inline-flex items-center gap-2">
+                        {p.note ?? 'Private project'}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
