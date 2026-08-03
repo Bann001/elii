@@ -411,31 +411,26 @@ export default function App() {
             <div>
               <h2 className="text-3xl font-semibold">Projects</h2>
               <p className="mt-2 text-white/70 max-w-2xl">
-                A few example projects. Replace names and links with your real work when you&apos;re ready.
+                A selection of real-world apps I&apos;ve built, spanning print tooling, drone operations, and secure team messaging.
               </p>
             </div>
 
             <div className="mt-10 grid gap-4 md:grid-cols-2">
               {[
                 {
-                  title: 'Pulse UI Dashboard',
-                  desc: 'A sleek dashboard with animated cards, filters, and responsive navigation.',
-                  tags: ['React', 'Tailwind', 'UX Motion'],
+                  title: 'Sticker Generator',
+                  desc: 'A web app for generating A4 label sheets — design custom stickers with product info, logos, and QR codes on the "Create" page, or generate RPU drone sticker sheets with mixed or uniform label sizes on the RPU page. Both export print-ready PDFs with canvas-rendered stickers at 300 DPI.',
+                  tags: ['React', 'Canvas', 'PDF Export', 'QR Codes'],
                 },
                 {
-                  title: 'Landing Page Studio',
-                  desc: 'One-page marketing layouts with modular sections and polished typography.',
-                  tags: ['UI Systems', 'Accessibility', 'Performance'],
+                  title: 'ATOMS',
+                  desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. It reads live data from a Supabase backend (vtiger CRM sync), uses Mapbox GL for maps, React Query for data fetching, shadcn/ui for components, and Tailwind for styling.',
+                  tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
                 },
                 {
-                  title: 'Portfolio Builder',
-                  desc: 'Templates + reusable components that let creators ship faster.',
-                  tags: ['Components', 'Design Tokens', 'Forms'],
-                },
-                {
-                  title: 'Tech Showcase',
-                  desc: 'Interactive tech stack visuals with scroll-reactive highlights.',
-                  tags: ['Animations', 'React', 'Tailwind'],
+                  title: 'SF Talk',
+                  desc: 'A secure, self-hosted company messaging platform built with an Express.js + MySQL backend and a React/Vite frontend. It features real-time messaging with Socket.io, user authentication, OR-based search, batch inserts, and full JSON column handling — replacing a PocketBase backend with a custom Node.js server for greater control and scalability.',
+                  tags: ['Express.js', 'MySQL', 'Socket.io', 'React', 'Vite'],
                 },
               ].map((p) => (
                 <div
