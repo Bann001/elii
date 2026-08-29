@@ -682,7 +682,7 @@ export default function App() {
                 index="02"
                 eyebrow="Projects"
                 title="Selected work"
-                desc="Real-world apps I've built, spanning print tooling, drone operations, and secure team messaging."
+                desc="Real-world apps I've built, spanning print tooling, drone operations, field marketing, and technical support systems."
               />
             </Reveal>
 
@@ -699,6 +699,18 @@ export default function App() {
                   desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. It reads live data from a Supabase backend (vtiger CRM sync), uses Mapbox GL for maps, React Query for data fetching, shadcn/ui for components, and Tailwind for styling.',
                   tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
                   href: 'https://atoms.agridomcorp.com',
+                },
+                {
+                  title: 'BrandSyncSMS',
+                  desc: 'A progressive web application built for field lead capture and marketing operations. It streamlines mobile contact capture, offline-ready workflows, and real-time synchronization for marketing teams on the ground.',
+                  tags: ['React', 'TypeScript', 'PWA', 'Tailwind', 'Vite'],
+                  href: 'https://sms-290z.onrender.com/',
+                },
+                {
+                  title: 'Aerobot Technical Support',
+                  desc: 'A comprehensive service portal and support management platform for Aerobot drone systems. Features service ticket workflows, Supabase backend integration, digital signature capture, PDF service report generation, and data analytics.',
+                  tags: ['React', 'TypeScript', 'Supabase', 'PDF Export', 'Recharts'],
+                  href: 'https://techsupport.aerobot.ph/',
                 },
                 {
                   title: 'SF Talk',

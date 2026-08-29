@@ -53,6 +53,20 @@ const PORTFOLIO = {
       tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
     },
     {
+      name: 'BrandSyncSMS',
+      status: 'Live',
+      url: 'https://sms-290z.onrender.com/',
+      desc: 'A progressive web application for field lead capture and marketing operations, facilitating real-time lead management, contact synchronization, and field team workflows.',
+      tags: ['React', 'TypeScript', 'PWA', 'Tailwind', 'Vite'],
+    },
+    {
+      name: 'Aerobot Technical Support',
+      status: 'Live',
+      url: 'https://techsupport.aerobot.ph/',
+      desc: 'A full-featured service operations and technical support portal for Aerobot drone systems, featuring ticket workflows, Supabase integration, digital signatures, PDF reports, and analytics.',
+      tags: ['React', 'TypeScript', 'Supabase', 'PDF Export', 'Recharts'],
+    },
+    {
       name: 'SF Talk',
       status: 'Local Production',
       url: null,
@@ -113,15 +127,23 @@ function answerFor(inputRaw: string) {
 
   // Specific project lookups
   if (containsAny(['sticker'])) {
-    const p = PORTFOLIO.projects[0]!
+    const p = PORTFOLIO.projects.find((item) => item.name === 'Sticker Generator')!
     return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.${p.url ? `\nLive: ${p.url}` : ''}`
   }
   if (containsAny(['atoms', 'drone spray', 'spraying'])) {
-    const p = PORTFOLIO.projects[1]!
+    const p = PORTFOLIO.projects.find((item) => item.name === 'ATOMS')!
+    return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.${p.url ? `\nLive: ${p.url}` : ''}`
+  }
+  if (containsAny(['brandsync', 'sms', 'lead capture', 'brandsyncsms'])) {
+    const p = PORTFOLIO.projects.find((item) => item.name === 'BrandSyncSMS')!
+    return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.${p.url ? `\nLive: ${p.url}` : ''}`
+  }
+  if (containsAny(['aerobot', 'techsupport', 'tech support', 'support portal'])) {
+    const p = PORTFOLIO.projects.find((item) => item.name === 'Aerobot Technical Support')!
     return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.${p.url ? `\nLive: ${p.url}` : ''}`
   }
   if (containsAny(['sf talk', 'messaging', 'chat app', 'socket'])) {
-    const p = PORTFOLIO.projects[2]!
+    const p = PORTFOLIO.projects.find((item) => item.name === 'SF Talk')!
     return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.`
   }
 
