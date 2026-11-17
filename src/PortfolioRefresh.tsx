@@ -183,11 +183,23 @@ export default function PortfolioRefresh() {
   const [tourActive, setTourActive] = useState(false)
   const [tourIndex, setTourIndex] = useState(0)
   const rootRef = useRef<HTMLDivElement | null>(null)
+  const tourActiveRef = useRef(false)
+  const advanceTimer = useRef(0)
   useAmbientMotion(rootRef)
 
-  const stopTour = () => setTourActive(false)
+  useEffect(() => {
+    tourActiveRef.current = tourActive
+  }, [tourActive])
+
+  useEffect(() => () => window.clearTimeout(advanceTimer.current), [])
+
+  const stopTour = () => {
+    window.clearTimeout(advanceTimer.current)
+    setTourActive(false)
+  }
 
   const startTour = () => {
+    window.clearTimeout(advanceTimer.current)
     setTourActive(true)
     setTourIndex(0)
     setReplayKey((key) => key + 1)
@@ -195,20 +207,28 @@ export default function PortfolioRefresh() {
   }
 
   const handleBuilt = (index: number) => {
-    if (!tourActive) return
+    if (!tourActiveRef.current) return
     if (index >= SECTION_IDS.length - 1) {
       setTourActive(false)
       return
     }
     const next = index + 1
-    setTourIndex(next)
-    document.getElementById(SECTION_IDS[next])?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // Let the finished section settle before gliding to the next one.
+    window.clearTimeout(advanceTimer.current)
+    advanceTimer.current = window.setTimeout(() => {
+      if (!tourActiveRef.current) return
+      document.getElementById(SECTION_IDS[next])?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      setTourIndex(next)
+    }, 700)
   }
 
   // Any deliberate user input ends the tour and hands control back.
   useEffect(() => {
     if (!tourActive) return
-    const cancel = () => setTourActive(false)
+    const cancel = () => {
+      window.clearTimeout(advanceTimer.current)
+      setTourActive(false)
+    }
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') cancel()
     }

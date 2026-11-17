@@ -155,7 +155,7 @@ export function BuildSection({
       const saved = targets.map((target) => ({ el: target.el, style: target.el.getAttribute('style') }))
       targets.forEach((target) => {
         const el = target.el
-        el.style.transition = 'opacity .3s ease, transform .45s cubic-bezier(.16,1,.3,1), clip-path .5s steps(26,end)'
+        el.style.transition = 'opacity .45s ease, transform .65s cubic-bezier(.16,1,.3,1), clip-path .8s steps(40,end)'
         el.style.opacity = '0'
         // Text starts fully clipped so it reveals like a typewriter.
         if (target.kind === 'text') el.style.clipPath = 'inset(0 100% 0 0)'
@@ -171,11 +171,24 @@ export function BuildSection({
       setStatus('building')
       setProgress({ current: 0, total: targets.length })
 
-      const STEP = 250
+      // Slower, cinematic pacing so each element can be seen being built.
+      const STEP = 420
       targets.forEach((target, index) => {
-        const at = 140 + index * STEP
+        const at = 200 + index * STEP
 
         timers.push(window.setTimeout(() => {
+          // During the tour, glide the viewport to whatever is being built
+          // if it isn't already comfortably on screen.
+          if (tourActive) {
+            const rect = target.el.getBoundingClientRect()
+            const margin = 96
+            const onScreen = rect.top >= margin && rect.bottom <= window.innerHeight - margin
+            if (!onScreen) {
+              const top = window.scrollY + rect.top - (window.innerHeight - rect.height) / 2
+              window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+            }
+          }
+
           setBoxes((prev) => [...prev, target])
           setCursor({
             x: target.rect.left + Math.min(target.rect.width / 2, 140),
@@ -193,7 +206,7 @@ export function BuildSection({
 
         timers.push(window.setTimeout(() => {
           setBoxes((prev) => prev.filter((box) => box.id !== target.id))
-        }, at + 420))
+        }, at + 720))
       })
 
       timers.push(window.setTimeout(() => {
@@ -202,7 +215,7 @@ export function BuildSection({
         restore = null
         setStatus('done')
         onBuilt?.(index)
-      }, 140 + targets.length * STEP + 520))
+      }, 200 + targets.length * STEP + 820))
     }
 
     startRef.current = start
@@ -269,7 +282,7 @@ export function BuildSection({
                   initial={{ width: 0, height: 0, opacity: 0 }}
                   animate={{ width: box.rect.width, height: box.rect.height, opacity: 1 }}
                   exit={{ opacity: 0, scale: 1.02 }}
-                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <span className="swarm-box__badge">{box.label}</span>
                 </motion.div>
@@ -286,7 +299,7 @@ export function BuildSection({
                   y: cursor.y + agent.oy,
                   opacity: cursor.visible ? (index === 0 ? 1 : 0.75) : 0,
                 }}
-                transition={{ type: 'spring', stiffness: 230 - index * 35, damping: 24, delay: index * 0.05 }}
+                transition={{ type: 'spring', stiffness: 140 - index * 22, damping: 20, delay: index * 0.08 }}
               >
                 <span className="swarm-cursor__glyph">
                   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -300,6 +313,9 @@ export function BuildSection({
             <div className="swarm-hud">
               <span className="swarm-hud__dot" />
               REBUILDING · {progress.current}/{progress.total}
+              <span className="swarm-hud__track">
+                <span style={{ width: `${progress.total ? (progress.current / progress.total) * 100 : 0}%` }} />
+              </span>
             </div>
           </motion.div>
         ) : null}

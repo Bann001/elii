@@ -278,12 +278,15 @@ a { color: inherit; }
 @keyframes swarm-caret { 50% { opacity: 0; } }
 
 .swarm-cursor { position: absolute; display: inline-flex; align-items: flex-start; gap: 4px; color: var(--c); filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+.swarm-cursor::before { content: ''; position: absolute; z-index: -1; inset: -14px; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--c) 32%, transparent), transparent 68%); filter: blur(7px); }
 .swarm-cursor__glyph { display: grid; width: 18px; height: 18px; place-items: center; }
 .swarm-cursor__glyph svg { width: 18px; height: 18px; }
 .swarm-cursor__name { margin-top: 14px; padding: 3px 7px; border-radius: 5px; background: var(--c); color: #06120f; font: 500 10px/1.2 var(--pr-mono); white-space: nowrap; }
 
 .swarm-hud { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border: 1px solid rgba(128,226,208,.25); border-radius: 999px; background: rgba(8,11,16,.85); color: #9fb0b8; font: 10px var(--pr-mono); letter-spacing: .12em; white-space: nowrap; }
 .swarm-hud__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pr-accent); box-shadow: 0 0 10px var(--pr-accent); animation: swarm-pulse 1s ease-in-out infinite alternate; }
+.swarm-hud__track { width: 64px; height: 3px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.12); }
+.swarm-hud__track > span { display: block; height: 100%; border-radius: inherit; background: var(--pr-accent); box-shadow: 0 0 8px rgba(128,226,208,.7); transition: width .35s ease; }
 @keyframes swarm-pulse { to { opacity: .35; transform: scale(.7); } }
 
 .pr-build-controls { position: fixed; z-index: 45; left: 18px; bottom: 18px; display: flex; gap: 8px; }
