@@ -42,9 +42,6 @@ function useScrollSpin(containerRef: RefObject<HTMLElement | null>) {
       const rect = el.getBoundingClientRect()
       const viewH = window.innerHeight || 1
 
-      // progress:
-      // 0 when element is below the viewport
-      // 1 when it has scrolled past the top
       const total = viewH + rect.height
       const passed = viewH - rect.top
       const progress = clamp01(passed / total)
@@ -228,16 +225,6 @@ function HeaderBrand() {
   )
 }
 
-/**
- * Pinned scroll-storytelling hero.
- *
- * The section is tall; an inner panel sticks to the viewport while the story
- * plays out in three scroll-driven beats:
- *   1. Oversized mascot zooms in with a greeting.
- *   2. The headline assembles as the mascot settles to the side.
- *   3. The pitch, tags, and calls-to-action arrive to form the final layout.
- * A reduced-motion fallback renders the finished composition statically.
- */
 function HeroStory() {
   const baseUrl = import.meta.env.BASE_URL
   const reduce = useReducedMotion()
@@ -253,25 +240,16 @@ function HeroStory() {
     mass: 0.4,
   })
 
-  // Mascot: zoom in, settle, and drift with a subtle tilt.
   const mascotScale = useTransform(p, [0, 0.55], [1.5, 1])
   const mascotRotate = useTransform(p, [0, 1], [-8, 5])
   const mascotY = useTransform(p, [0, 1], [40, -40])
   const glowScale = useTransform(p, [0, 0.55], [1.4, 1])
-
-  // Beat 1 — greeting.
   const greetOpacity = useTransform(p, [0, 0.16, 0.26], [1, 1, 0])
   const greetY = useTransform(p, [0, 0.26], [0, -28])
-
-  // Beat 2 — headline.
   const titleOpacity = useTransform(p, [0.2, 0.42], [0, 1])
   const titleY = useTransform(p, [0.2, 0.42], [44, 0])
-
-  // Beat 3 — details + CTAs.
   const detailOpacity = useTransform(p, [0.56, 0.82], [0, 1])
   const detailY = useTransform(p, [0.56, 0.82], [44, 0])
-
-  // Scroll hint fades quickly once the journey begins.
   const hintOpacity = useTransform(p, [0, 0.08], [1, 0])
 
   if (reduce) {
@@ -292,7 +270,6 @@ function HeroStory() {
       <div className="sticky top-0 flex h-screen items-center overflow-hidden">
         <div className="mx-auto w-full max-w-6xl px-4">
           <div className="grid items-center gap-8 md:grid-cols-2 md:gap-10">
-            {/* Mascot */}
             <div className="order-2 md:order-1">
               <motion.div
                 style={{ scale: mascotScale, rotate: mascotRotate, y: mascotY }}
@@ -324,7 +301,6 @@ function HeroStory() {
               </motion.div>
             </div>
 
-            {/* Story copy */}
             <div className="relative order-1 md:order-2 min-h-[20rem]">
               <motion.p
                 style={{ opacity: greetOpacity, y: greetY }}
@@ -335,9 +311,9 @@ function HeroStory() {
 
               <motion.div style={{ opacity: titleOpacity, y: titleY }} className="mt-4">
                 <div className="flex flex-wrap gap-2.5">
+                  <Pill>Product UI</Pill>
+                  <Pill>Design systems</Pill>
                   <Pill>React + Tailwind</Pill>
-                  <Pill>Professional UI</Pill>
-                  <Pill>Scroll-reactive motion</Pill>
                 </div>
 
                 <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.03]">
@@ -355,8 +331,8 @@ function HeroStory() {
 
               <motion.div style={{ opacity: detailOpacity, y: detailY }}>
                 <p className="mt-6 max-w-md text-base sm:text-lg text-white/60 leading-relaxed text-pretty">
-                  Front-end designer and engineer focused on clean, accessible interfaces — from
-                  dashboards and PWAs to production tooling that people actually enjoy using.
+                  Front-end designer and engineer building clean, useful digital products — from
+                  dashboards and workflows to product experiences that feel effortless to use.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -379,7 +355,6 @@ function HeroStory() {
           </div>
         </div>
 
-        {/* Scroll hint */}
         <motion.div
           style={{ opacity: hintOpacity }}
           className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/40"
@@ -398,7 +373,6 @@ function HeroStory() {
   )
 }
 
-/** Static mascot card used by the reduced-motion hero fallback. */
 function MascotCard({ baseUrl }: { baseUrl: string }) {
   return (
     <div className="order-2 lg:order-1">
@@ -425,14 +399,13 @@ function MascotCard({ baseUrl }: { baseUrl: string }) {
   )
 }
 
-/** Static hero copy used by the reduced-motion hero fallback. */
 function HeroCopy() {
   return (
     <div className="order-1 lg:order-2">
       <div className="flex flex-wrap gap-2.5">
+        <Pill>Product UI</Pill>
+        <Pill>Design systems</Pill>
         <Pill>React + Tailwind</Pill>
-        <Pill>Professional UI</Pill>
-        <Pill>Scroll-reactive motion</Pill>
       </div>
 
       <h1 className="mt-6 flex flex-wrap items-baseline gap-x-3 gap-y-2 text-4xl sm:text-5xl lg:text-6xl font-semibold leading-[1.03]">
@@ -448,8 +421,8 @@ function HeroCopy() {
       </h1>
 
       <p className="mt-6 max-w-md text-base sm:text-lg text-white/60 leading-relaxed text-pretty">
-        Front-end designer and engineer focused on clean, accessible interfaces — from dashboards
-        and PWAs to production tooling that people actually enjoy using.
+        Front-end designer and engineer building clean, useful digital products — from dashboards
+        and workflows to product experiences that feel effortless to use.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
@@ -479,23 +452,24 @@ function AboutSection() {
           <SectionHeader
             index="00"
             eyebrow="About"
-            title="I turn product complexity into interfaces people trust"
-            desc="I work across design and engineering so the interface feels polished, useful, and easy to navigate — from internal dashboards to customer-facing web experiences."
+            title="I help teams turn complex operations into clearer product experiences"
+            desc="I bridge design and front-end engineering so products feel intentional, usable, and fast — whether they’re internal tools, dashboards, or customer-facing interfaces."
           />
         </Reveal>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Reveal direction="right" className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
             <p className="text-white/70 leading-relaxed">
-              My work is built around one simple idea: good software should feel clear before it
-              feels clever. I focus on thoughtful structure, readable interfaces, and motion that helps
-              users understand what matters most.
+              My approach is simple: make complexity feel obvious. I work at the intersection of UI,
+              product thinking, and implementation so interfaces don’t just look polished — they help
+              people move faster and make better decisions.
             </p>
+
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {[
-                { value: '5+', label: 'Years building interfaces' },
-                { value: '10+', label: 'Projects shipped' },
-                { value: '100%', label: 'User-first thinking' },
+                { value: '5+', label: 'Years building product interfaces' },
+                { value: '10+', label: 'Projects shipped across operations and web apps' },
+                { value: 'UX+', label: 'Design + engineering in one workflow' },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl border border-white/[0.08] bg-slate-900/40 p-4">
                   <div className="font-display text-2xl font-semibold text-accent">{item.value}</div>
@@ -506,12 +480,24 @@ function AboutSection() {
           </Reveal>
 
           <Reveal direction="left" delay={0.08} className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
-            <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">How I work</div>
+            <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">My workflow</div>
             <div className="mt-6 space-y-4">
               {[
-                { step: '01', title: 'Understand the problem', text: 'Clarify business goals, user pain points, and the real decisions the product needs to support.' },
-                { step: '02', title: 'Design for clarity', text: 'Create clean interfaces, strong hierarchy, and responsive layouts that feel consistent across screen sizes.' },
-                { step: '03', title: 'Build and refine', text: 'Translate the design into robust front-end code with performance, accessibility, and maintainability in mind.' },
+                {
+                  step: '01',
+                  title: 'Understand the problem',
+                  text: 'Clarify the user need, operational workflow, and product objective before touching the UI.',
+                },
+                {
+                  step: '02',
+                  title: 'Design for clarity',
+                  text: 'Create clean interfaces, focused hierarchies, and responsive layouts that reduce cognitive load.',
+                },
+                {
+                  step: '03',
+                  title: 'Ship and refine',
+                  text: 'Build the experience in code with performance, accessibility, and maintainability in mind.',
+                },
               ].map((item) => (
                 <div key={item.step} className="flex gap-4 rounded-2xl border border-white/[0.06] bg-slate-900/35 p-4">
                   <div className="font-mono text-sm text-accent">{item.step}</div>
@@ -606,32 +592,29 @@ export default function App() {
         <section id="whatido" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
-              <Reveal
-                direction="right"
-                className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10"
-              >
+              <Reveal direction="right" className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10">
                 <div className="text-xs font-medium uppercase tracking-[0.2em] text-accent">What I do</div>
                 <h2 className="mt-4 text-2xl sm:text-3xl font-semibold text-white text-balance">
                   Design and engineering, working as one
                 </h2>
                 <p className="mt-3 text-white/60 max-w-xl leading-relaxed">
-                  I build professional front-end experiences with clean structure, modern styling, and motion
-                  that adds clarity instead of noise.
+                  I build product experiences that are readable, usable, and fast — from workflow-heavy
+                  internal tools to polished customer-facing interfaces.
                 </p>
 
                 <div className="mt-8 grid gap-3">
                   {[
                     {
-                      title: 'Clean, scalable UI',
-                      desc: 'Tailwind-first layouts with consistent spacing, typography, and accessibility.',
+                      title: 'UI systems that scale',
+                      desc: 'Structured layouts, reusable patterns, and visual rules that keep products consistent as they grow.',
                     },
                     {
-                      title: 'Motion that means something',
-                      desc: 'Scroll-reactive effects that guide attention, never distract from content.',
+                      title: 'Motion with purpose',
+                      desc: 'Subtle motion that guides attention, clarifies actions, and strengthens the product story.',
                     },
                     {
-                      title: 'Practical front-end engineering',
-                      desc: 'Components, forms, and responsive behavior built for real users.',
+                      title: 'Practical front-end execution',
+                      desc: 'Responsive, accessible, production-ready interfaces built for real users and real business needs.',
                     },
                   ].map((item) => (
                     <div
@@ -648,37 +631,26 @@ export default function App() {
                     </div>
                   ))}
                 </div>
-
-                <div className="mt-6 flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-white/50">Currently building</span>
-                  <span className="text-xs rounded-full px-3 py-1 border border-white/10 bg-white/[0.04] text-white/75">
-                    portfolios, dashboards, landing pages
-                  </span>
-                </div>
               </Reveal>
 
-              <Reveal
-                direction="left"
-                delay={0.1}
-                className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10 h-full"
-              >
-                <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Highlights</div>
+              <Reveal direction="left" delay={0.1} className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-10 h-full">
+                <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">Why teams hire me</div>
                 <div className="mt-6 grid gap-3">
                   {[
                     {
-                      stat: '100%',
-                      title: 'UI polish',
-                      desc: 'Consistent spacing, typography, and micro-interactions for a premium feel.',
+                      stat: 'Clear',
+                      title: 'UX clarity',
+                      desc: 'Interfaces that break down complexity into clear, useful decisions.',
                     },
                     {
-                      stat: 'Mobile-first',
-                      title: 'Responsive by default',
-                      desc: 'Clean layouts that scale from mobile to desktop without breaking.',
+                      stat: 'Fast',
+                      title: 'Execution',
+                      desc: 'Modern front-end code that ships efficiently with a product mindset.',
                     },
                     {
-                      stat: 'Vite',
-                      title: 'Fast builds',
-                      desc: 'Modern tooling for quick iterations and smooth developer UX.',
+                      stat: 'Reliable',
+                      title: 'Build quality',
+                      desc: 'Responsive, maintainable interfaces designed to last beyond the launch sprint.',
                     },
                   ].map((item) => (
                     <div
@@ -702,12 +674,12 @@ export default function App() {
               <SectionHeader
                 index="01"
                 eyebrow="Skills"
-                title="Tools for building polished experiences"
-                desc="A focused toolkit for designing, building, and refining front-end experiences end to end."
+                title="Tools for turning ideas into usable product experiences"
+                desc="I work across product thinking, UI design, and front-end implementation so the experience is both beautiful and useful."
                 aside={
                   <div className="hidden md:block text-right">
-                    <div className="text-xs uppercase tracking-[0.2em] text-white/40">Approach</div>
-                    <div className="mt-1 text-sm text-white/70">Design + engineering, together</div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/40">Focus</div>
+                    <div className="mt-1 text-sm text-white/70">Strategy + interface + execution</div>
                   </div>
                 }
               />
@@ -715,12 +687,12 @@ export default function App() {
 
             <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {[
-                { title: 'React Components', desc: 'Reusable patterns, clean state, predictable UI.' },
-                { title: 'Tailwind Styling', desc: 'Design systems using utility classes and layers.' },
-                { title: 'UI Motion', desc: 'Typing + scroll effects with performant updates.' },
-                { title: 'Responsive Layouts', desc: 'Mobile-first structure with careful typography.' },
-                { title: 'Forms & Validation', desc: 'User-friendly interactions and accessible controls.' },
-                { title: 'Performance Mindset', desc: 'Avoid unnecessary renders and keep it smooth.' },
+                { title: 'Product UI design', desc: 'Design systems, information hierarchy, and interfaces built for clarity and speed.' },
+                { title: 'Front-end engineering', desc: 'React, TypeScript, and component-driven implementation that feels production-ready.' },
+                { title: 'Design systems', desc: 'Consistent tokens, layouts, interactions, and reusable patterns across products.' },
+                { title: 'Responsive product UX', desc: 'Mobile-first experiences that stay intuitive across device sizes and workflows.' },
+                { title: 'Forms & workflows', desc: 'User-friendly flows, validation, and operational tools that reduce friction.' },
+                { title: 'Performance-minded building', desc: 'Clean code, thoughtful structure, and performant interfaces that stay smooth in use.' },
               ].map((s, i) => (
                 <Reveal
                   key={s.title}
@@ -746,8 +718,8 @@ export default function App() {
               <SectionHeader
                 index="02"
                 eyebrow="Projects"
-                title="Selected work"
-                desc="Real-world apps I've built, spanning print tooling, drone operations, field marketing, and technical support systems."
+                title="Selected work that solves real product problems"
+                desc="A mix of workflow tools, operational platforms, and user-facing experiences focused on clarity, speed, and adoption."
               />
             </Reveal>
 
@@ -755,31 +727,31 @@ export default function App() {
               {[
                 {
                   title: 'Sticker Generator',
-                  desc: 'A web app for generating A4 label sheets — design custom stickers with product info, logos, and QR codes on the "Create" page, or generate RPU drone sticker sheets with print-ready outputs.',
+                  desc: 'A print workflow tool for generating branded sticker sheets and label layouts with custom product data and export-ready output.',
                   tags: ['React', 'Canvas', 'PDF Export', 'QR Codes'],
                   href: 'https://bann001.github.io/hr-sticker',
                 },
                 {
                   title: 'ATOMS',
-                  desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. It reads live data from a Supabase backend, uses Mapbox GL for maps, and brings operational workflows into one interface.',
+                  desc: 'A drone operations dashboard for managing spraying workflows, live field data, and map-based operational visibility.',
                   tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
                   href: 'https://atoms.agridomcorp.com',
                 },
                 {
                   title: 'BrandSyncSMS',
-                  desc: 'A progressive web application built for field lead capture and marketing operations. It streamlines mobile contact capture, offline-ready workflows, and real-time syncing for field teams.',
+                  desc: 'A mobile-focused lead capture and field marketing app designed to simplify contact collection and streamline operations in the field.',
                   tags: ['React', 'TypeScript', 'PWA', 'Tailwind', 'Vite'],
                   href: 'https://sms-290z.onrender.com/',
                 },
                 {
                   title: 'Aerobot Technical Support',
-                  desc: 'A comprehensive service portal and support management platform for Aerobot drone systems. Features service ticket workflows, Supabase backend integration, digital signatures, PDF reporting, and analytics.',
+                  desc: 'A service portal for support teams, featuring ticket workflows, reporting, digital signatures, and operational analytics.',
                   tags: ['React', 'TypeScript', 'Supabase', 'PDF Export', 'Recharts'],
                   href: 'https://techsupport.aerobot.ph/',
                 },
                 {
                   title: 'SF Talk',
-                  desc: 'A secure, self-hosted company messaging platform built with an Express.js + MySQL backend and a React/Vite frontend. It features real-time messaging, user administration, and fast search.',
+                  desc: 'A secure internal messaging platform with real-time chat, search, and user management for communication-heavy teams.',
                   tags: ['Express.js', 'MySQL', 'Socket.io', 'React', 'Vite'],
                   href: null,
                   note: 'Local Production',
@@ -792,9 +764,7 @@ export default function App() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <span className="font-mono text-xs text-accent/70">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
+                      <span className="font-mono text-xs text-accent/70">{String(i + 1).padStart(2, '0')}</span>
                       <h3 className="mt-1 text-xl font-semibold text-white transition-colors group-hover:text-accent-soft">
                         {p.title}
                       </h3>
@@ -855,26 +825,17 @@ export default function App() {
               <SectionHeader
                 index="03"
                 eyebrow="Tech Stack"
-                title="What I build with"
-                desc="The tools I reach for most often to ship clean, modern experiences."
+                title="The tools I build with"
+                desc="A practical set of technologies for shipping clean, durable digital products."
               />
             </Reveal>
 
             <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {[
-                {
-                  title: 'Languages',
-                  items: ['TypeScript', 'JavaScript', 'HTML', 'CSS3', 'PHP'],
-                },
+                { title: 'Languages', items: ['TypeScript', 'JavaScript', 'HTML', 'CSS3', 'PHP'] },
                 { title: 'Databases', items: ['MySQL', 'PostgreSQL', 'SQLite', 'MongoDB'] },
-                {
-                  title: 'Tools',
-                  items: ['Git', 'Linux', 'Docker', 'Nginx', 'Apache'],
-                },
-                {
-                  title: 'Frameworks',
-                  items: ['React', 'TailwindCSS', 'Vite', 'WordPress', 'Elementor', 'Elementor Pro'],
-                },
+                { title: 'Tools', items: ['Git', 'Linux', 'Docker', 'Nginx', 'Apache'] },
+                { title: 'Frameworks', items: ['React', 'TailwindCSS', 'Vite', 'WordPress', 'Elementor', 'Elementor Pro'] },
               ].map((group, i) => (
                 <Reveal
                   key={group.title}
@@ -911,8 +872,8 @@ export default function App() {
                   Let&apos;s build something great
                 </h2>
                 <p className="mt-3 text-white/60 max-w-md leading-relaxed">
-                  Want a formal, professional one-pager with motion that actually looks good? Tell me about
-                  your project and I&apos;ll get back to you.
+                  Need a clean product interface, a dashboard, or a polished web experience that feels
+                  purposeful? Tell me what you&apos;re building and I&apos;ll get back to you.
                 </p>
 
                 <div className="mt-8 space-y-3">
@@ -948,9 +909,7 @@ export default function App() {
         <footer className="py-10 border-t border-white/[0.06] bg-slate-950/30">
           <div className="mx-auto max-w-6xl px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <HeaderBrand />
-            <div className="text-sm text-white/50">
-              © {new Date().getFullYear()} DevBann. All rights reserved.
-            </div>
+            <div className="text-sm text-white/50">© {new Date().getFullYear()} DevBann. All rights reserved.</div>
           </div>
         </footer>
       </main>
@@ -983,7 +942,6 @@ function ContactForm() {
           form.set('email', email.trim())
           form.set('message', message.trim())
           form.set('_subject', subject)
-          // Lets you control the reply-to address in Formspree (if enabled).
           form.set('_replyto', email.trim())
 
           fetch(CONTACT_FORM_ENDPOINT, {
