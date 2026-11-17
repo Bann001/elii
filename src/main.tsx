@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import TodoApp from './TodoApp'
 import './index.css'
+import './portfolio.css'
 
 const isTodoApp = new URLSearchParams(window.location.search).get('app') === 'todo'
 
