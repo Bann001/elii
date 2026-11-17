@@ -13,9 +13,12 @@ type Project = {
   description: string
   details: string[]
   stack: string[]
+  image?: string
   url?: string
   status?: string
 }
+
+const baseUrl = import.meta.env.BASE_URL
 
 const projects: Project[] = [
   {
@@ -24,23 +27,8 @@ const projects: Project[] = [
     description: 'A PWA for drone spraying operations, bringing field data and map-based workflows into one tool.',
     details: ['Live Supabase data', 'Map-based operations', 'React Query data fetching'],
     stack: ['React', 'TypeScript', 'Supabase', 'Mapbox GL'],
+    image: `${baseUrl}imgs/projects/atoms.jpg`,
     url: 'https://atoms.agridomcorp.com',
-  },
-  {
-    name: 'Aerobot Technical Support',
-    group: 'Operations',
-    description: 'A technical support portal for drone systems with service workflows and reporting tools.',
-    details: ['Service tickets', 'Digital signatures', 'PDF reports and analytics'],
-    stack: ['React', 'TypeScript', 'Supabase', 'Recharts'],
-    url: 'https://techsupport.aerobot.ph/',
-  },
-  {
-    name: 'Sticker Generator',
-    group: 'Field tools',
-    description: 'A browser-based tool for creating custom product labels and drone sticker sheets for print.',
-    details: ['Custom product information', 'Logo and QR code support', 'Print-ready PDF output'],
-    stack: ['React', 'Canvas', 'PDF export', 'QR codes'],
-    url: 'https://bann001.github.io/hr-sticker',
   },
   {
     name: 'BrandSyncSMS',
@@ -48,7 +36,17 @@ const projects: Project[] = [
     description: 'A mobile-friendly PWA for field lead capture and marketing workflows.',
     details: ['Mobile contact capture', 'Offline-ready workflows', 'Contact synchronization'],
     stack: ['React', 'TypeScript', 'PWA', 'Tailwind'],
+    image: `${baseUrl}imgs/projects/brandsyncsms.jpg`,
     url: 'https://sms-290z.onrender.com/',
+  },
+  {
+    name: 'Aerobot Technical Support',
+    group: 'Operations',
+    description: 'A technical support portal for drone systems with service workflows and reporting tools.',
+    details: ['Service tickets', 'Digital signatures', 'PDF reports and analytics'],
+    stack: ['React', 'TypeScript', 'Supabase', 'Recharts'],
+    image: `${baseUrl}imgs/projects/aerobot.jpg`,
+    url: 'https://techsupport.aerobot.ph/',
   },
   {
     name: 'SF Talk',
@@ -56,6 +54,7 @@ const projects: Project[] = [
     description: 'A self-hosted company messaging platform with real-time chat and search.',
     details: ['Real-time messaging', 'User administration', 'Search'],
     stack: ['React', 'Express.js', 'MySQL', 'Socket.io'],
+    image: `${baseUrl}imgs/projects/sftalk.jpg`,
     status: 'Local production',
   },
 ]
@@ -292,7 +291,7 @@ export default function PortfolioRefresh() {
                 <a className="pr-button pr-button-quiet" href={`mailto:bannsire@gmail.com`}>Contact me</a>
               </div>
             </div>
-            <div className="pr-hero-index"><span>01 — 05</span><span>Product interfaces / web applications</span></div>
+            <div className="pr-hero-index"><span>01 — 04</span><span>Product interfaces / web applications</span></div>
           </div>
           <div className="pr-hero-mascot" aria-hidden="true">
             <div className="pr-mascot-halo" />
@@ -355,8 +354,17 @@ export default function PortfolioRefresh() {
               {visibleProjects.map((project, index) => (
                 <article className={`pr-project-card ${index === 0 && filter === 'All work' ? 'pr-project-featured' : ''}`} key={project.name}>
                   <div className="pr-project-topline"><span>{project.group}</span><span>{project.url ? 'LIVE' : project.status}</span></div>
-                  <div className="pr-project-visual" aria-hidden="true">
-                    <div className="pr-visual-window"><div className="pr-window-controls"><i /><i /><i /></div><div className="pr-visual-layout"><div className="pr-visual-sidebar"/><div className="pr-visual-main"><i/><i/><i/><i/></div></div></div>
+                  <div className="pr-project-visual">
+                    <div className="pr-visual-window">
+                      <div className="pr-window-controls"><i /><i /><i /></div>
+                      {project.image ? (
+                        <div className="pr-visual-screen">
+                          <img src={project.image} alt={`${project.name} interface preview`} loading="lazy" />
+                        </div>
+                      ) : (
+                        <div className="pr-visual-layout"><div className="pr-visual-sidebar" /><div className="pr-visual-main"><i /><i /><i /><i /></div></div>
+                      )}
+                    </div>
                     <span className="pr-visual-number">{String(index + 1).padStart(2, '0')}</span>
                   </div>
                   <div className="pr-project-copy">
