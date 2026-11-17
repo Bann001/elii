@@ -1,0 +1,166 @@
+/* Portfolio visual refresh: calmer surfaces, clearer hierarchy, and consistent interaction states. */
+:root {
+  color-scheme: dark;
+  --portfolio-bg: #070b12;
+  --portfolio-surface: rgba(15, 23, 36, 0.72);
+  --portfolio-line: rgba(180, 205, 222, 0.12);
+  --portfolio-muted: rgba(221, 232, 241, 0.64);
+  --portfolio-glow: rgba(34, 211, 238, 0.12);
+}
+
+html {
+  scroll-padding-top: 6rem;
+  scrollbar-color: rgba(148, 163, 184, 0.35) var(--portfolio-bg);
+}
+
+body {
+  background: var(--portfolio-bg);
+}
+
+body::selection {
+  background: rgba(103, 232, 249, 0.28);
+}
+
+/* Scope the refresh to the portfolio, leaving the standalone todo app alone. */
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip {
+  background:
+    radial-gradient(ellipse at 50% -18%, rgba(34, 211, 238, 0.13), transparent 46%),
+    radial-gradient(ellipse at 92% 38%, rgba(37, 99, 235, 0.07), transparent 32%),
+    var(--portfolio-bg);
+  isolation: isolate;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip > header {
+  border-color: var(--portfolio-line);
+  background: rgba(7, 11, 18, 0.78);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.015);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip > header > div > div {
+  min-height: 76px;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip header a,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip main a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip main > section:not(#home) {
+  position: relative;
+  scroll-margin-top: 6rem;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip main > section:not(#home) > div {
+  position: relative;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip h1 {
+  max-width: 13ch;
+  text-wrap: balance;
+  letter-spacing: -0.055em;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip h2 {
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip p {
+  text-wrap: pretty;
+}
+
+/* Give content cards a more deliberate surface and a quieter border. */
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip .card-sheen,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #about > div > div > div,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #whatido > div > div > div,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #tech .rounded-2xl,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #contact .rounded-3xl {
+  border-color: var(--portfolio-line);
+  background-color: var(--portfolio-surface);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.025);
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #projects .card-sheen {
+  background-image:
+    radial-gradient(ellipse at 95% 0%, rgba(34, 211, 238, 0.07), transparent 36%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.018), transparent 58%);
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #projects .card-sheen:hover,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #skills .card-sheen:hover,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #tech .rounded-2xl:hover {
+  border-color: rgba(103, 232, 249, 0.32);
+  background-color: rgba(17, 28, 42, 0.9);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.24), 0 0 28px rgba(34, 211, 238, 0.045);
+  transform: translateY(-2px);
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #about,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #skills,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #projects,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #tech,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #contact {
+  padding-top: clamp(5rem, 9vw, 8rem);
+  padding-bottom: clamp(5rem, 9vw, 8rem);
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #projects h3 {
+  letter-spacing: -0.035em;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #contact input,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #contact textarea {
+  border-color: rgba(180, 205, 222, 0.16);
+  background: rgba(7, 11, 18, 0.72);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #contact input:focus,
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #contact textarea:focus {
+  border-color: rgba(103, 232, 249, 0.7);
+  background: rgba(7, 11, 18, 0.94);
+  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1);
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip :where(a, button, input, textarea):focus-visible {
+  outline: 2px solid rgba(103, 232, 249, 0.9);
+  outline-offset: 3px;
+}
+
+.relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip footer {
+  border-color: var(--portfolio-line);
+  background: rgba(7, 11, 18, 0.72);
+}
+
+@media (max-width: 640px) {
+  .relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip main > section:not(#home) {
+    scroll-margin-top: 5rem;
+  }
+
+  .relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #projects .card-sheen,
+  .relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip #skills .card-sheen {
+    border-radius: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip *,
+  .relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip *::before,
+  .relative.min-h-screen.bg-slate-950.text-slate-100.overflow-x-clip *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
