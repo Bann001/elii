@@ -12,6 +12,7 @@ import { Reveal } from './motion'
 
 const NAV_ITEMS = [
   { label: 'Home', href: '#home' },
+  { label: 'About', href: '#about' },
   { label: 'Skills', href: '#skills' },
   { label: 'Projects', href: '#projects' },
   { label: 'Tech Stack', href: '#tech' },
@@ -20,7 +21,12 @@ const NAV_ITEMS = [
 const ROLE_PHRASES = ['interfaces', 'web_apps', 'product_experiences'] as const
 const ROLE_MAX_CHARS = Math.max(...ROLE_PHRASES.map((p) => p.length))
 const CONTACT_EMAIL = 'bannsire@gmail.com'
+const GITHUB_URL = 'https://github.com/Bann001'
 const CONTACT_FORM_ENDPOINT = 'https://formspree.io/f/mkopnqdw'
+const PROFILE_LINKS = [
+  { label: 'GitHub', href: GITHUB_URL },
+  { label: 'Email', href: `mailto:${CONTACT_EMAIL}` },
+] as const
 
 function clamp01(n: number) {
   return Math.max(0, Math.min(1, n))
@@ -465,6 +471,64 @@ function HeroCopy() {
   )
 }
 
+function AboutSection() {
+  return (
+    <section id="about" className="py-20 sm:py-24">
+      <div className="mx-auto max-w-6xl px-4">
+        <Reveal>
+          <SectionHeader
+            index="00"
+            eyebrow="About"
+            title="I turn product complexity into interfaces people trust"
+            desc="I work across design and engineering so the interface feels polished, useful, and easy to navigate — from internal dashboards to customer-facing web experiences."
+          />
+        </Reveal>
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <Reveal direction="right" className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
+            <p className="text-white/70 leading-relaxed">
+              My work is built around one simple idea: good software should feel clear before it
+              feels clever. I focus on thoughtful structure, readable interfaces, and motion that helps
+              users understand what matters most.
+            </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {[
+                { value: '5+', label: 'Years building interfaces' },
+                { value: '10+', label: 'Projects shipped' },
+                { value: '100%', label: 'User-first thinking' },
+              ].map((item) => (
+                <div key={item.label} className="rounded-2xl border border-white/[0.08] bg-slate-900/40 p-4">
+                  <div className="font-display text-2xl font-semibold text-accent">{item.value}</div>
+                  <div className="mt-1 text-sm text-white/60">{item.label}</div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+
+          <Reveal direction="left" delay={0.08} className="rounded-3xl border border-white/[0.08] bg-white/[0.03] p-6 sm:p-8">
+            <div className="text-xs font-medium uppercase tracking-[0.2em] text-white/50">How I work</div>
+            <div className="mt-6 space-y-4">
+              {[
+                { step: '01', title: 'Understand the problem', text: 'Clarify business goals, user pain points, and the real decisions the product needs to support.' },
+                { step: '02', title: 'Design for clarity', text: 'Create clean interfaces, strong hierarchy, and responsive layouts that feel consistent across screen sizes.' },
+                { step: '03', title: 'Build and refine', text: 'Translate the design into robust front-end code with performance, accessibility, and maintainability in mind.' },
+              ].map((item) => (
+                <div key={item.step} className="flex gap-4 rounded-2xl border border-white/[0.06] bg-slate-900/35 p-4">
+                  <div className="font-mono text-sm text-accent">{item.step}</div>
+                  <div>
+                    <div className="font-semibold text-white/90">{item.title}</div>
+                    <div className="mt-1 text-sm text-white/60 leading-relaxed">{item.text}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function App() {
   const [activeHref, setActiveHref] = useState('#home')
 
@@ -496,7 +560,7 @@ export default function App() {
     <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-x-clip">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,_rgba(34,211,238,0.14),_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,black,transparent_75%)] opacity-30" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:64px_64px] opacity-40" />
       </div>
 
       <header className="fixed left-0 right-0 top-0 z-50 backdrop-blur-md bg-slate-950/70 border-b border-white/[0.06]">
@@ -537,6 +601,7 @@ export default function App() {
 
       <main className="relative">
         <HeroStory />
+        <AboutSection />
 
         <section id="whatido" className="py-20 sm:py-24">
           <div className="mx-auto max-w-6xl px-4">
@@ -690,31 +755,31 @@ export default function App() {
               {[
                 {
                   title: 'Sticker Generator',
-                  desc: 'A web app for generating A4 label sheets — design custom stickers with product info, logos, and QR codes on the "Create" page, or generate RPU drone sticker sheets with mixed or uniform label sizes on the RPU page. Both export print-ready PDFs with canvas-rendered stickers at 300 DPI.',
+                  desc: 'A web app for generating A4 label sheets — design custom stickers with product info, logos, and QR codes on the "Create" page, or generate RPU drone sticker sheets with print-ready outputs.',
                   tags: ['React', 'Canvas', 'PDF Export', 'QR Codes'],
                   href: 'https://bann001.github.io/hr-sticker',
                 },
                 {
                   title: 'ATOMS',
-                  desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. It reads live data from a Supabase backend (vtiger CRM sync), uses Mapbox GL for maps, React Query for data fetching, shadcn/ui for components, and Tailwind for styling.',
+                  desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. It reads live data from a Supabase backend, uses Mapbox GL for maps, and brings operational workflows into one interface.',
                   tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
                   href: 'https://atoms.agridomcorp.com',
                 },
                 {
                   title: 'BrandSyncSMS',
-                  desc: 'A progressive web application built for field lead capture and marketing operations. It streamlines mobile contact capture, offline-ready workflows, and real-time synchronization for marketing teams on the ground.',
+                  desc: 'A progressive web application built for field lead capture and marketing operations. It streamlines mobile contact capture, offline-ready workflows, and real-time syncing for field teams.',
                   tags: ['React', 'TypeScript', 'PWA', 'Tailwind', 'Vite'],
                   href: 'https://sms-290z.onrender.com/',
                 },
                 {
                   title: 'Aerobot Technical Support',
-                  desc: 'A comprehensive service portal and support management platform for Aerobot drone systems. Features service ticket workflows, Supabase backend integration, digital signature capture, PDF service report generation, and data analytics.',
+                  desc: 'A comprehensive service portal and support management platform for Aerobot drone systems. Features service ticket workflows, Supabase backend integration, digital signatures, PDF reporting, and analytics.',
                   tags: ['React', 'TypeScript', 'Supabase', 'PDF Export', 'Recharts'],
                   href: 'https://techsupport.aerobot.ph/',
                 },
                 {
                   title: 'SF Talk',
-                  desc: 'A secure, self-hosted company messaging platform built with an Express.js + MySQL backend and a React/Vite frontend. It features real-time messaging with Socket.io, user authentication, OR-based search, batch inserts, and full JSON column handling — replacing a PocketBase backend with a custom Node.js server for greater control and scalability.',
+                  desc: 'A secure, self-hosted company messaging platform built with an Express.js + MySQL backend and a React/Vite frontend. It features real-time messaging, user administration, and fast search.',
                   tags: ['Express.js', 'MySQL', 'Socket.io', 'React', 'Vite'],
                   href: null,
                   note: 'Local Production',
@@ -851,20 +916,25 @@ export default function App() {
                 </p>
 
                 <div className="mt-8 space-y-3">
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}`}
-                    className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 hover:border-accent/30 transition-colors"
-                  >
-                    <span className="grid h-10 w-10 place-items-center rounded-xl border border-accent/25 bg-accent/10 text-accent">
-                      @
-                    </span>
-                    <div>
-                      <div className="text-xs uppercase tracking-wider text-white/40">Email</div>
-                      <div className="text-sm font-semibold text-white/90 group-hover:text-accent-soft transition-colors">
-                        {CONTACT_EMAIL}
+                  {PROFILE_LINKS.map((link) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target={link.href.startsWith('http') ? '_blank' : undefined}
+                      rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      className="group flex items-center gap-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 hover:border-accent/30 transition-colors"
+                    >
+                      <span className="grid h-10 w-10 place-items-center rounded-xl border border-accent/25 bg-accent/10 text-accent text-sm font-semibold">
+                        {link.label === 'GitHub' ? 'GH' : '@'}
+                      </span>
+                      <div>
+                        <div className="text-xs uppercase tracking-wider text-white/40">{link.label}</div>
+                        <div className="text-sm font-semibold text-white/90 group-hover:text-accent-soft transition-colors">
+                          {link.label === 'GitHub' ? 'github.com/Bann001' : CONTACT_EMAIL}
+                        </div>
                       </div>
-                    </div>
-                  </a>
+                    </a>
+                  ))}
                 </div>
               </Reveal>
 
