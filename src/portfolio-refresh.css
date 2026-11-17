@@ -35,6 +35,11 @@ a { color: inherit; }
     var(--pr-bg);
 }
 .portfolio-refresh * { box-sizing: border-box; }
+
+/* Hide the scrollbar while keeping scrolling functional (keyboard, wheel, touch). */
+html { scrollbar-width: none; }
+html::-webkit-scrollbar, body::-webkit-scrollbar, .portfolio-refresh *::-webkit-scrollbar { display: none; }
+body, .portfolio-refresh * { scrollbar-width: none; }
 .pr-shell { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
 .pr-skip { position: fixed; top: 10px; left: 10px; z-index: 100; padding: 12px 16px; border-radius: 8px; background: var(--pr-accent); color: #06120f; transform: translateY(-160%); }
 .pr-skip:focus { transform: translateY(0); }
@@ -196,6 +201,7 @@ a { color: inherit; }
 .pr-contact-copy { max-width: 380px; margin: 16px 0 0; color: var(--pr-muted); font-size: 13px; line-height: 1.75; }
 .pr-contact-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
 .pr-email-address { flex-basis: 100%; color: #8f9ca4; text-align: right; font: 10px var(--pr-mono); }
+.pr-email-address:hover { color: var(--pr-accent); }
 .pr-footer { padding: 24px 0; }
 .pr-footer > .pr-shell { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .pr-footer > .pr-shell > span, .pr-footer > .pr-shell > a:last-child { color: #7e8a92; font-size: 10px; text-decoration: none; }

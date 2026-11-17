@@ -25,60 +25,54 @@ function pick<T>(arr: T[]) {
  */
 const PORTFOLIO = {
   owner: 'DevBann',
-  role: 'Front-end designer and engineer focused on clean, accessible interfaces — from dashboards and PWAs to production tooling.',
+  role: 'Backend-leaning engineer focused on data modelling, APIs, and real-time services — from MySQL and PostgreSQL to Supabase and Socket.io.',
   email: 'bannsire@gmail.com',
   whatIDo:
-    'DevBann builds professional front-end experiences: clean, scalable UI with Tailwind, motion that adds clarity, and practical front-end engineering (components, forms, responsive behavior).',
+    'DevBann builds the backend behind working products: data models, REST APIs, real-time services, and integrations. Front-end interfaces (React and Tailwind) are assembled with AI coding tools such as Claude and Copilot as a helper, not as the main focus.',
   skills: [
-    'React Components — reusable patterns, clean state, predictable UI',
-    'Tailwind Styling — design systems using utility classes and layers',
-    'UI Motion — typing + scroll effects with performant updates',
-    'Responsive Layouts — mobile-first structure with careful typography',
-    'Forms & Validation — user-friendly, accessible controls',
-    'Performance Mindset — avoid unnecessary renders and keep it smooth',
+    'Node.js & Express — APIs, routing, middleware, server-side logic',
+    'MySQL & PostgreSQL — schema design, queries, and data modelling',
+    'Supabase — hosted Postgres, auth, and realtime subscriptions',
+    'Real-time services — Socket.io chat and event handling',
+    'AI-assisted UI — React/Tailwind interfaces generated with Claude and Copilot',
+    'Infra basics — Linux, Docker, Nginx, and Cloudflare Workers',
   ],
   projects: [
-    {
-      name: 'Sticker Generator',
-      status: 'Live',
-      url: 'https://bann001.github.io/hr-sticker',
-      desc: 'A web app for generating A4 label sheets — design custom stickers with product info, logos, and QR codes, or generate RPU drone sticker sheets. Exports print-ready PDFs with canvas-rendered stickers at 300 DPI.',
-      tags: ['React', 'Canvas', 'PDF Export', 'QR Codes'],
-    },
     {
       name: 'ATOMS',
       status: 'Live',
       url: 'https://atoms.agridomcorp.com',
-      desc: 'A Vite + React + TypeScript PWA for managing drone spraying operations. Reads live data from a Supabase backend (vtiger CRM sync), uses Mapbox GL for maps, React Query for data fetching, shadcn/ui, and Tailwind.',
-      tags: ['Vite', 'TypeScript', 'Supabase', 'Mapbox GL', 'React Query'],
+      desc: 'A drone spraying operations PWA. Live Supabase data, map-based workflows, and React Query data fetching. The backend handles the data model and queries; the interface was assembled with AI tooling.',
+      tags: ['Node.js', 'Supabase', 'Mapbox GL', 'React Query'],
     },
     {
       name: 'BrandSyncSMS',
       status: 'Live',
       url: 'https://sms-290z.onrender.com/',
-      desc: 'A progressive web application for field lead capture and marketing operations, facilitating real-time lead management, contact synchronization, and field team workflows.',
-      tags: ['React', 'TypeScript', 'PWA', 'Tailwind', 'Vite'],
+      desc: 'A field lead capture PWA focused on contact synchronization and offline-ready data workflows. Backend work covers the sync layer and data handling; the UI was generated with AI tools.',
+      tags: ['React', 'TypeScript', 'PWA', 'AI-assisted UI'],
     },
     {
       name: 'Aerobot Technical Support',
       status: 'Live',
       url: 'https://techsupport.aerobot.ph/',
-      desc: 'A full-featured service operations and technical support portal for Aerobot drone systems, featuring ticket workflows, Supabase integration, digital signatures, PDF reports, and analytics.',
-      tags: ['React', 'TypeScript', 'Supabase', 'PDF Export', 'Recharts'],
+      desc: 'A service operations portal for drone systems: ticket workflows, digital signatures, PDF reporting, and data-backed analytics on a Supabase backend.',
+      tags: ['Supabase', 'PDF export', 'Recharts', 'React'],
     },
     {
       name: 'SF Talk',
       status: 'Local Production',
       url: null,
-      desc: 'A secure, self-hosted company messaging platform with an Express.js + MySQL backend and a React/Vite frontend. Features real-time messaging with Socket.io, authentication, search, batch inserts, and JSON column handling.',
-      tags: ['Express.js', 'MySQL', 'Socket.io', 'React', 'Vite'],
+      desc: 'A self-hosted messaging platform with an Express.js + MySQL backend and a React/Vite frontend. Real-time messaging over Socket.io, auth, search, and user administration.',
+      tags: ['Express.js', 'MySQL', 'Socket.io', 'React'],
     },
   ],
   tech: {
-    Languages: ['TypeScript', 'JavaScript', 'HTML', 'CSS3', 'PHP'],
-    Databases: ['MySQL', 'PostgreSQL', 'SQLite', 'MongoDB'],
-    Tools: ['Git', 'Linux', 'Docker', 'Nginx', 'Apache'],
-    Frameworks: ['React', 'TailwindCSS', 'Vite', 'WordPress', 'Elementor', 'Elementor Pro'],
+    Languages: ['TypeScript', 'JavaScript', 'SQL', 'PHP'],
+    Databases: ['MySQL', 'PostgreSQL', 'Supabase', 'SQLite'],
+    Backend: ['Node.js', 'Express', 'REST APIs', 'Socket.io'],
+    Tools: ['Git', 'Linux', 'Docker', 'Nginx', 'Cloudflare Workers'],
+    'AI-assisted UI': ['React', 'TailwindCSS', 'Vite', 'Claude / Copilot', 'PWA'],
   },
 } as const
 
@@ -126,10 +120,6 @@ function answerFor(inputRaw: string) {
   }
 
   // Specific project lookups
-  if (containsAny(['sticker'])) {
-    const p = PORTFOLIO.projects.find((item) => item.name === 'Sticker Generator')!
-    return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.${p.url ? `\nLive: ${p.url}` : ''}`
-  }
   if (containsAny(['atoms', 'drone spray', 'spraying'])) {
     const p = PORTFOLIO.projects.find((item) => item.name === 'ATOMS')!
     return `${p.name} (${p.status}): ${p.desc}\nBuilt with: ${p.tags.join(', ')}.${p.url ? `\nLive: ${p.url}` : ''}`

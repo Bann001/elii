@@ -6,6 +6,12 @@ import { BuildSection } from './SwarmBuild'
 const LOGO_SRC = `${import.meta.env.BASE_URL}imgs/logo.png`
 const SECTION_IDS = ['home', 'about', 'skills', 'projects', 'contact'] as const
 
+const CONTACT_EMAIL = 'bannsire@gmail.com'
+
+// Opens Gmail's compose window with the recipient already filled in.
+const composeUrl = (to: string) =>
+  `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent('Portfolio enquiry')}`
+
 type ProjectGroup = 'Operations' | 'Field tools' | 'Communication'
 type Project = {
   name: string
@@ -24,7 +30,7 @@ const projects: Project[] = [
   {
     name: 'ATOMS',
     group: 'Operations',
-    description: 'A PWA for drone spraying operations, bringing field data and map-based workflows into one tool.',
+    description: 'A PWA for drone spraying operations. Handles live Supabase data, map-based workflows, and React Query data fetching, with the UI assembled from AI-assisted component patterns.',
     details: ['Live Supabase data', 'Map-based operations', 'React Query data fetching'],
     stack: ['React', 'TypeScript', 'Supabase', 'Mapbox GL'],
     image: `${baseUrl}imgs/projects/atoms.jpg`,
@@ -33,7 +39,7 @@ const projects: Project[] = [
   {
     name: 'BrandSyncSMS',
     group: 'Field tools',
-    description: 'A mobile-friendly PWA for field lead capture and marketing workflows.',
+    description: 'A mobile-friendly PWA for field lead capture and marketing. Focused on contact synchronization and offline-ready data workflows, with the interface generated using AI tooling.',
     details: ['Mobile contact capture', 'Offline-ready workflows', 'Contact synchronization'],
     stack: ['React', 'TypeScript', 'PWA', 'Tailwind'],
     image: `${baseUrl}imgs/projects/brandsyncsms.jpg`,
@@ -42,7 +48,7 @@ const projects: Project[] = [
   {
     name: 'Aerobot Technical Support',
     group: 'Operations',
-    description: 'A technical support portal for drone systems with service workflows and reporting tools.',
+    description: 'A technical support portal for drone systems. Builds service workflows, digital signatures, and PDF reporting with data-backed analytics.',
     details: ['Service tickets', 'Digital signatures', 'PDF reports and analytics'],
     stack: ['React', 'TypeScript', 'Supabase', 'Recharts'],
     image: `${baseUrl}imgs/projects/aerobot.jpg`,
@@ -51,7 +57,7 @@ const projects: Project[] = [
   {
     name: 'SF Talk',
     group: 'Communication',
-    description: 'A self-hosted company messaging platform with real-time chat and search.',
+    description: 'A self-hosted messaging platform with real-time chat and search, backed by Express.js, MySQL, and Socket.io, plus user administration.',
     details: ['Real-time messaging', 'User administration', 'Search'],
     stack: ['React', 'Express.js', 'MySQL', 'Socket.io'],
     image: `${baseUrl}imgs/projects/sftalk.jpg`,
@@ -61,10 +67,10 @@ const projects: Project[] = [
 
 const filters = ['All work', 'Operations', 'Field tools', 'Communication'] as const
 const skillGroups = [
-  { title: 'Interface development', items: ['React', 'TypeScript', 'JavaScript', 'HTML', 'CSS', 'TailwindCSS'] },
-  { title: 'Data & services', items: ['Supabase', 'MySQL', 'PostgreSQL', 'SQLite', 'MongoDB'] },
-  { title: 'Mapping & reporting', items: ['Mapbox GL', 'Canvas', 'PDF export', 'Recharts'] },
-  { title: 'Platforms & tools', items: ['Vite', 'PWA', 'Git', 'Linux', 'Docker', 'Nginx'] },
+  { title: 'Backend & data', items: ['Node.js', 'Express', 'MySQL', 'PostgreSQL', 'Supabase', 'REST APIs', 'Redis'] },
+  { title: 'Realtime & integrations', items: ['Socket.io', 'Mapbox GL', 'Stripe', 'Cloudflare Workers'] },
+  { title: 'Languages & platforms', items: ['TypeScript', 'JavaScript', 'SQL', 'Linux', 'Docker', 'Nginx'] },
+  { title: 'AI-assisted UI', items: ['React', 'Tailwind', 'Vite', 'Claude / Copilot', 'PWA'] },
 ]
 
 type AmbientKind = 'planet' | 'ring' | 'glass' | 'cube' | 'orb' | 'spark'
@@ -282,16 +288,16 @@ export default function PortfolioRefresh() {
           <FloatingScene />
           <div className="pr-hero-grid" aria-hidden="true" />
           <div className="pr-shell pr-hero-content">
-            <p className="pr-kicker"><span className="pr-kicker-line" /> Portfolio · Front-end & product UI</p>
-            <h1 id="hero-title">Thoughtful interfaces.<br /><span>Useful software.</span></h1>
+            <p className="pr-kicker"><span className="pr-kicker-line" /> Portfolio · Backend & full-stack engineer</p>
+            <h1 id="hero-title">Reliable backends.<br /><span>Interfaces built with AI.</span></h1>
             <div className="pr-hero-bottom">
-              <p className="pr-hero-copy">I build web applications and interfaces with React, TypeScript, and a focus on practical workflows.</p>
+              <p className="pr-hero-copy">Backend-focused engineer working with Node.js, SQL, and real-time services. I handle the data, APIs, and infrastructure, and use AI tools to build the interfaces that go on top.</p>
               <div className="pr-hero-actions">
                 <a className="pr-button pr-button-primary" href="#projects">Explore selected work <ArrowIcon /></a>
-                <a className="pr-button pr-button-quiet" href={`mailto:bannsire@gmail.com`}>Contact me</a>
+                <a className="pr-button pr-button-quiet" href={composeUrl(CONTACT_EMAIL)} target="_blank" rel="noopener noreferrer">Contact me</a>
               </div>
             </div>
-            <div className="pr-hero-index"><span>01 — 04</span><span>Product interfaces / web applications</span></div>
+            <div className="pr-hero-index"><span>01 — 04</span><span>APIs · databases · real-time services</span></div>
           </div>
           <div className="pr-hero-mascot" aria-hidden="true">
             <div className="pr-mascot-halo" />
@@ -305,13 +311,13 @@ export default function PortfolioRefresh() {
           <div className="pr-shell">
             <div className="pr-section-heading">
               <p className="pr-eyebrow">01 / About</p>
-              <h2 id="about-title">The work is where<br />my story starts.</h2>
+              <h2 id="about-title">I work where<br />the data lives.</h2>
             </div>
             <div className="pr-about-content">
-              <p className="pr-about-lead">My portfolio brings together web apps for operations, field teams, support workflows, print tools, and internal communication.</p>
-              <p className="pr-body-copy">Across these projects, I’ve used React and TypeScript to build interfaces, connected products to services such as Supabase and MySQL, and worked with tools including Mapbox GL, Socket.io, Canvas, and PDF export. The common thread is building practical software with a clear interface.</p>
+              <p className="pr-about-lead">I’m a backend-leaning engineer. Most of my work is designing data models, building APIs, wiring up real-time services, and keeping production systems running.</p>
+              <p className="pr-body-copy">Across these projects I’ve worked with Node.js, Express, MySQL, PostgreSQL, and Supabase, plus Socket.io for real-time messaging and map integrations. I ship the backend first, then use AI coding tools to assemble the front-end interfaces — React and Tailwind components generated and refined with Claude and Copilot rather than hand-built. The front-end is a tool I use well; the back-end is where I focus.</p>
               <div className="pr-about-tags" aria-label="Areas represented in my projects">
-                <span>Operations dashboards</span><span>PWAs</span><span>Field workflows</span><span>Support tools</span><span>Real-time apps</span>
+                <span>REST APIs</span><span>MySQL / PostgreSQL</span><span>Supabase</span><span>Real-time chat</span><span>Node.js</span>
               </div>
               <a className="pr-text-link" href="#projects">See the projects <ArrowIcon /></a>
             </div>
@@ -321,8 +327,8 @@ export default function PortfolioRefresh() {
         <BuildSection id="skills" className="pr-section pr-skills" ariaLabelledBy="skills-title" replayKey={replayKey} index={2} tourActive={tourActive} tourIndex={tourIndex} onBuilt={handleBuilt}>
           <div className="pr-shell">
             <div className="pr-section-heading pr-heading-row">
-              <div><p className="pr-eyebrow">02 / Skills</p><h2 id="skills-title">A practical toolkit,<br />used in real projects.</h2></div>
-              <p className="pr-heading-note">Grouped by how the tools show up in the work—not by a rating or proficiency claim.</p>
+              <div><p className="pr-eyebrow">02 / Skills</p><h2 id="skills-title">What I bring<br />to a backend role.</h2></div>
+              <p className="pr-heading-note">Grouped by how the tools show up in the work—not by a rating or proficiency claim. UI tooling is included because I use it, not because it is my focus.</p>
             </div>
             <div className="pr-skill-grid">
               {skillGroups.map((group, index) => (
@@ -339,8 +345,8 @@ export default function PortfolioRefresh() {
         <BuildSection id="projects" className="pr-section pr-projects" ariaLabelledBy="projects-title" replayKey={replayKey} index={3} tourActive={tourActive} tourIndex={tourIndex} onBuilt={handleBuilt}>
           <div className="pr-shell">
             <div className="pr-section-heading pr-heading-row">
-              <div><p className="pr-eyebrow">03 / Selected work</p><h2 id="projects-title">Different problems.<br />Useful, working products.</h2></div>
-              <p className="pr-heading-note">A selection of live applications and production tools. Open a live project to explore it.</p>
+              <div><p className="pr-eyebrow">03 / Selected work</p><h2 id="projects-title">Systems I built.<br />Interfaces I generated.</h2></div>
+              <p className="pr-heading-note">Each project is a working system with real data behind it. The UI was built with AI coding tools; the backend, data model, and integrations are mine.</p>
             </div>
 
             <div className="pr-filter-bar" role="group" aria-label="Filter projects">
@@ -384,11 +390,18 @@ export default function PortfolioRefresh() {
 
         <BuildSection id="contact" className="pr-section pr-contact" ariaLabelledBy="contact-title" replayKey={replayKey} index={4} tourActive={tourActive} tourIndex={tourIndex} onBuilt={handleBuilt}>
           <div className="pr-shell pr-contact-panel">
-            <div><p className="pr-eyebrow">04 / Contact</p><h2 id="contact-title">Have a project<br />in mind?</h2><p className="pr-contact-copy">Get in touch by email or explore the code and projects on GitHub.</p></div>
+            <div><p className="pr-eyebrow">04 / Contact</p><h2 id="contact-title">Hiring for a<br />backend role?</h2><p className="pr-contact-copy">Click the email below and Gmail opens with the recipient already filled in — just write and send.</p></div>
             <div className="pr-contact-actions">
-              <a className="pr-button pr-button-primary" href="mailto:bannsire@gmail.com">Email DevBann <ArrowIcon /></a>
+              <a
+                className="pr-button pr-button-primary"
+                href={composeUrl(CONTACT_EMAIL)}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Email DevBann <ArrowIcon />
+              </a>
               <a className="pr-button pr-button-outline" href="https://github.com/Bann001" target="_blank" rel="noopener noreferrer">GitHub <ExternalIcon /></a>
-              <span className="pr-email-address">bannsire@gmail.com</span>
+              <a className="pr-email-address" href={composeUrl(CONTACT_EMAIL)} target="_blank" rel="noopener noreferrer">{CONTACT_EMAIL}</a>
             </div>
           </div>
         </BuildSection>
